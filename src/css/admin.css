@@ -611,6 +611,18 @@ body.login-page {
   margin-bottom: 1rem;
 }
 
+.section-row {
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.section-row__actions {
+  display: flex;
+  flex-shrink: 0;
+  gap: 0.35rem;
+  padding-top: 1.5rem;
+}
+
 /* ── Responsive ── */
 @media (max-width: 768px) {
   .admin-layout { flex-direction: column; }

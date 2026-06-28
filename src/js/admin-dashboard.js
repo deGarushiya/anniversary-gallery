@@ -15,9 +15,19 @@ import {
   usesSupabase,
 } from './gallery-api.js';
 
+import {
+  catalogEntry,
+  resolveNavTabs,
+} from './sections-config.js';
+
 const SESSION_KEY = 'gallery-admin-auth';
 const toast = document.getElementById('toast');
 let galleryData = null;
+let activeAdminTab = 'settings';
+
+function escAttr(str) {
+  return String(str ?? '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+}
 
 function showToast(msg, err = false) {
   toast.textContent = msg;
@@ -27,14 +37,91 @@ function showToast(msg, err = false) {
 }
 
 function initTabs() {
-  document.querySelectorAll('.sidebar__btn').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.sidebar__btn').forEach((b) => b.classList.remove('sidebar__btn--active'));
-      document.querySelectorAll('.tab-panel').forEach((p) => p.classList.remove('tab-panel--active'));
-      btn.classList.add('sidebar__btn--active');
-      document.getElementById(`tab-${btn.dataset.tab}`).classList.add('tab-panel--active');
-    });
+  document.getElementById('sidebar-nav').addEventListener('click', (e) => {
+    const btn = e.target.closest('.sidebar__btn');
+    if (!btn?.dataset.tab) return;
+    switchAdminTab(btn.dataset.tab);
   });
+}
+
+function switchAdminTab(tabId) {
+  activeAdminTab = tabId;
+  document.querySelectorAll('.sidebar__btn').forEach((b) => {
+    b.classList.toggle('sidebar__btn--active', b.dataset.tab === tabId);
+  });
+  document.querySelectorAll('.tab-panel').forEach((p) => {
+    p.classList.toggle('tab-panel--active', p.id === `tab-${tabId}`);
+  });
+}
+
+function renderAdminSidebar() {
+  const nav = document.getElementById('sidebar-nav');
+  const enabled = resolveNavTabs(galleryData).filter((t) => t.enabled);
+  let html = `<button class="sidebar__btn${activeAdminTab === 'settings' ? ' sidebar__btn--active' : ''}" data-tab="settings">Settings</button>`;
+  enabled.forEach((tab) => {
+    const cat = catalogEntry(tab.key);
+    const active = activeAdminTab === cat.adminTab ? ' sidebar__btn--active' : '';
+    html += `<button class="sidebar__btn${active}" data-tab="${cat.adminTab}">${escAttr(tab.label)}</button>`;
+  });
+  html += `<button class="sidebar__btn${activeAdminTab === 'sections' ? ' sidebar__btn--active' : ''}" data-tab="sections">Page Tabs</button>`;
+  html += `<button class="sidebar__btn${activeAdminTab === 'password' ? ' sidebar__btn--active' : ''}" data-tab="password">Site Password</button>`;
+  nav.innerHTML = html;
+}
+
+function renderSectionsManager() {
+  const el = document.getElementById('sections-manager');
+  const tabs = resolveNavTabs(galleryData);
+  const enabled = tabs.filter((t) => t.enabled);
+  const disabled = tabs.filter((t) => !t.enabled);
+
+  if (!enabled.length) {
+    el.innerHTML = '<p class="tab-panel__hint">No tabs on the public site yet. Add one below.</p>';
+  } else {
+    el.innerHTML = enabled.map((tab, i) => {
+      const cat = catalogEntry(tab.key);
+      return `
+        <div class="admin-item section-row" data-key="${tab.key}">
+          <div class="admin-item__body">
+            <label class="field field--full"><span>Tab label</span>
+              <input type="text" class="input section-label" value="${escAttr(tab.label)}" />
+            </label>
+            <p class="admin-item__meta">${escAttr(cat.defaultLabel)} section</p>
+          </div>
+          <div class="section-row__actions">
+            <button type="button" class="btn btn--ghost btn--sm" data-move="up" ${i === 0 ? 'disabled' : ''} title="Move up">↑</button>
+            <button type="button" class="btn btn--ghost btn--sm" data-move="down" ${i === enabled.length - 1 ? 'disabled' : ''} title="Move down">↓</button>
+            <button type="button" class="btn btn--danger btn--sm" data-remove="${tab.key}">Remove</button>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  const select = document.getElementById('section-add-select');
+  select.innerHTML = disabled.length
+    ? disabled.map((t) => `<option value="${t.key}">${escAttr(catalogEntry(t.key).defaultLabel)}</option>`).join('')
+    : '<option value="">All tabs are active</option>';
+  select.disabled = !disabled.length;
+}
+
+function collectNavTabsFromManager() {
+  const tabs = resolveNavTabs(galleryData);
+  const disabled = tabs.filter((t) => !t.enabled);
+  const rows = [...document.querySelectorAll('.section-row')];
+  const enabled = rows.map((row) => {
+    const key = row.dataset.key;
+    const cat = catalogEntry(key);
+    const label = row.querySelector('.section-label')?.value.trim() || cat.defaultLabel;
+    return { key, label, enabled: true };
+  });
+  return [...enabled, ...disabled];
+}
+
+async function saveNavTabs() {
+  galleryData.navTabs = collectNavTabsFromManager();
+  galleryData = await saveGallery(galleryData);
+  renderAdminSidebar();
+  renderSectionsManager();
+  showToast('Page tabs saved');
 }
 
 async function loadGalleryData() {
@@ -88,6 +175,8 @@ function populateAll() {
   renderWeddingList();
   renderHighlightsAdmin();
   renderGalleryAdmin();
+  renderAdminSidebar();
+  renderSectionsManager();
 }
 
 document.getElementById('settings-form').addEventListener('submit', async (e) => {
@@ -543,6 +632,54 @@ document.getElementById('upload-form').addEventListener('submit', async (e) => {
     renderGalleryAdmin();
     showToast('Photo uploaded');
   } catch (err) { showToast(err.message, true); }
+});
+
+document.getElementById('sections-manager').addEventListener('click', async (e) => {
+  const removeKey = e.target.dataset.remove;
+  const move = e.target.dataset.move;
+  if (!removeKey && !move) return;
+
+  let tabs = resolveNavTabs(galleryData);
+  const enabled = tabs.filter((t) => t.enabled);
+
+  if (removeKey) {
+    tabs = tabs.map((t) => (t.key === removeKey ? { ...t, enabled: false } : t));
+  } else {
+    const row = e.target.closest('.section-row');
+    const idx = enabled.findIndex((t) => t.key === row?.dataset.key);
+    if (idx === -1) return;
+    const swap = move === 'up' ? idx - 1 : idx + 1;
+    if (swap < 0 || swap >= enabled.length) return;
+    [enabled[idx], enabled[swap]] = [enabled[swap], enabled[idx]];
+    const disabled = tabs.filter((t) => !t.enabled);
+    tabs = [...enabled, ...disabled];
+  }
+
+  galleryData.navTabs = tabs;
+  galleryData = await saveGallery(galleryData);
+  renderAdminSidebar();
+  renderSectionsManager();
+  showToast(removeKey ? 'Tab removed' : 'Tab moved');
+});
+
+document.getElementById('section-add-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const key = document.getElementById('section-add-select').value;
+  if (!key) return;
+  const tabs = resolveNavTabs(galleryData);
+  const toAdd = tabs.find((t) => t.key === key);
+  const rest = tabs.filter((t) => t.key !== key);
+  const enabled = rest.filter((t) => t.enabled);
+  const disabled = rest.filter((t) => !t.enabled);
+  galleryData.navTabs = [...enabled, { ...toAdd, enabled: true }, ...disabled];
+  galleryData = await saveGallery(galleryData);
+  renderAdminSidebar();
+  renderSectionsManager();
+  showToast('Tab added');
+});
+
+document.getElementById('sections-save').addEventListener('click', () => {
+  saveNavTabs().catch((err) => showToast(err.message, true));
 });
 
 document.getElementById('logout-btn').addEventListener('click', async () => {

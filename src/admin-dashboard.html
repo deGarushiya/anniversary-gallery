@@ -13,24 +13,9 @@
   <div class="admin-layout">
     <aside class="sidebar">
       <h1 class="sidebar__title">Gallery Admin</h1>
-      <nav class="sidebar__nav" id="sidebar-nav">
-        <button class="sidebar__btn sidebar__btn--active" data-tab="settings">Settings</button>
-        <button class="sidebar__btn" data-tab="featured">Featured Photo</button>
-        <button class="sidebar__btn" data-tab="timeline">Timeline</button>
-        <button class="sidebar__btn" data-tab="thennow">Then & Now</button>
-        <button class="sidebar__btn" data-tab="wedding">Wedding Day</button>
-        <button class="sidebar__btn" data-tab="highlights">Highlights</button>
-        <button class="sidebar__btn" data-tab="quotes">Quotes</button>
-        <button class="sidebar__btn" data-tab="places">Places</button>
-        <button class="sidebar__btn" data-tab="letter">Love Letter</button>
-        <button class="sidebar__btn" data-tab="song">Our Song</button>
-        <button class="sidebar__btn" data-tab="messages">Messages</button>
-        <button class="sidebar__btn" data-tab="videos">Videos</button>
-        <button class="sidebar__btn" data-tab="gallery">Gallery</button>
-        <button class="sidebar__btn" data-tab="password">Site Password</button>
-      </nav>
+      <nav class="sidebar__nav" id="sidebar-nav"></nav>
       <div class="sidebar__footer">
-        <a href="/" class="btn btn--ghost btn--block" target="_blank">View Site</a>
+        <a href="index.html" class="btn btn--ghost btn--block" target="_blank" rel="noopener">View Site</a>
         <button class="btn btn--ghost btn--block" id="logout-btn">Logout</button>
       </div>
     </aside>
@@ -225,6 +210,18 @@
           <label class="field field--full"><span>Site Password</span><input type="text" id="site-password" class="input" placeholder="Leave empty for public access" /></label>
           <button type="submit" class="btn btn--primary">Save Password</button>
         </form>
+      </section>
+
+      <!-- Page tabs -->
+      <section class="tab-panel" id="tab-sections">
+        <h2 class="tab-panel__title">Page Tabs</h2>
+        <p class="tab-panel__hint">Add, remove, rename, and reorder the tabs visitors see on your gallery. Settings and Site Password always stay in the admin menu.</p>
+        <div id="sections-manager" class="admin-list"></div>
+        <form class="form-inline" id="section-add-form">
+          <label class="field"><span>Add tab</span><select id="section-add-select" class="input"></select></label>
+          <button type="submit" class="btn btn--primary">Add Tab</button>
+        </form>
+        <button type="button" class="btn btn--primary" id="sections-save">Save Tab Changes</button>
       </section>
     </main>
   </div>

@@ -1,6 +1,10 @@
 import { loadGallery } from './gallery-api.js';
-
-const SITE_AUTH_KEY = 'gallery-site-auth';
+import {
+  catalogEntry,
+  enabledNavTabs,
+  isNavTabEnabled,
+  resolveNavTabs,
+} from './sections-config.js';
 
 function assetUrl(src) {
   if (!src) return '';
@@ -14,21 +18,7 @@ let allImages = [];
 let currentLightboxIndex = 0;
 let slideshowTimer = null;
 let slideshowIndex = 0;
-
-const SECTIONS = [
-  { id: 'section-featured', label: 'Featured' },
-  { id: 'section-timeline', label: 'Our Story' },
-  { id: 'section-then-now', label: 'Then & Now' },
-  { id: 'section-wedding', label: 'Wedding' },
-  { id: 'section-highlights', label: 'Highlights' },
-  { id: 'section-quotes', label: 'Quotes' },
-  { id: 'section-places', label: 'Places' },
-  { id: 'section-letter', label: 'Letter' },
-  { id: 'section-song', label: 'Our Song' },
-  { id: 'section-messages', label: 'Messages' },
-  { id: 'section-videos', label: 'Videos' },
-  { id: 'section-gallery', label: 'Gallery' },
-];
+const SITE_AUTH_KEY = 'gallery-site-auth';
 
 async function init() {
   try {
@@ -83,8 +73,18 @@ function renderAll() {
   renderMonthNav();
   renderGallery();
   buildLightboxList();
+  applySectionVisibility();
   setupLightbox();
   setupSlideshow();
+}
+
+function applySectionVisibility() {
+  resolveNavTabs(galleryData).forEach((tab) => {
+    if (tab.enabled) return;
+    const cat = catalogEntry(tab.key);
+    const el = document.getElementById(cat.sectionId);
+    if (el) el.hidden = true;
+  });
 }
 
 function renderMeta() {
@@ -123,18 +123,22 @@ function renderMeta() {
 function renderSectionNav() {
   const nav = document.getElementById('section-nav');
   nav.innerHTML = '';
-  SECTIONS.forEach((s, i) => {
+  const tabs = enabledNavTabs(galleryData);
+  tabs.forEach((tab, i) => {
+    const cat = catalogEntry(tab.key);
     const btn = document.createElement('button');
     btn.className = `section-nav__btn${i === 0 ? ' section-nav__btn--active' : ''}`;
-    btn.textContent = s.label;
+    btn.textContent = tab.label;
     btn.addEventListener('click', () => {
-      document.getElementById(s.id)?.scrollIntoView({ behavior: 'smooth' });
+      document.getElementById(cat.sectionId)?.scrollIntoView({ behavior: 'smooth' });
     });
     nav.appendChild(btn);
   });
+  nav.hidden = tabs.length === 0;
 }
 
 function renderFeatured() {
+  if (!isNavTabEnabled(galleryData, 'featured')) return;
   const el = document.getElementById('featured-content');
   const fp = galleryData.featuredPhoto;
   if (!fp?.src) {
