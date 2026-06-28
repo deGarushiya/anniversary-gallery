@@ -1,0 +1,160 @@
+{
+  "title": "Our Love Story",
+  "subtitle": "Counting down to forever — July 5, 2026",
+  "weddingDate": "2026-07-05",
+  "togetherSince": "2024-06-15",
+  "sitePassword": "",
+  "featuredPhoto": {
+    "src": "https://images.unsplash.com/photo-1519741497674-611481863552?w=1200&q=80",
+    "caption": "Two hearts, one beautiful journey"
+  },
+  "ourSong": {
+    "title": "Perfect",
+    "artist": "Ed Sheeran",
+    "url": "https://open.spotify.com/track/0tgWrCpJiCBWUvWQYJAny4"
+  },
+  "loveLetter": {
+    "title": "A Letter Before Our Wedding",
+    "content": "My love, every day with you feels like a page from the most beautiful story ever written. We are not married yet — but my heart already knows. I cannot wait to stand beside you on July 5, 2026 and promise you forever."
+  },
+  "thenAndNow": {
+    "then": {
+      "src": "https://images.unsplash.com/photo-1522673606300-8d9631bd15b4?w=800&q=80",
+      "caption": "The day everything changed"
+    },
+    "now": {
+      "src": "https://images.unsplash.com/photo-1529636798458-92179e477f6c?w=800&q=80",
+      "caption": "Planning our forever together"
+    }
+  },
+  "timeline": [
+    {
+      "id": "tl-1",
+      "date": "2024-06-15",
+      "title": "We Met",
+      "description": "The moment our eyes met, the world got a little brighter.",
+      "image": ""
+    },
+    {
+      "id": "tl-2",
+      "date": "2024-09-20",
+      "title": "First Date",
+      "description": "Coffee turned into hours. Hours turned into everything.",
+      "image": ""
+    },
+    {
+      "id": "tl-3",
+      "date": "2025-12-24",
+      "title": "The Proposal",
+      "description": "You said yes. I said forever.",
+      "image": ""
+    },
+    {
+      "id": "tl-4",
+      "date": "2026-07-05",
+      "title": "Our Wedding Day",
+      "description": "The day we become one. Almost here.",
+      "image": "",
+      "upcoming": true
+    }
+  ],
+  "quotes": [
+    {
+      "id": "q-1",
+      "text": "You're my favorite notification.",
+      "date": "2025-02-14"
+    },
+    {
+      "id": "q-2",
+      "text": "Home is wherever I'm with you.",
+      "date": "2025-08-01"
+    }
+  ],
+  "places": [
+    {
+      "id": "p-1",
+      "name": "Where We Met",
+      "location": "Our favorite café",
+      "description": "The place where two strangers became soulmates."
+    },
+    {
+      "id": "p-2",
+      "name": "Where He Proposed",
+      "location": "Under the stars",
+      "description": "The night the question was asked — and answered with tears of joy."
+    },
+    {
+      "id": "p-3",
+      "name": "Our Wedding Venue",
+      "location": "Coming July 5, 2026",
+      "description": "Where we'll say I do."
+    }
+  ],
+  "weddingDay": {
+    "title": "Our Wedding Day",
+    "subtitle": "July 5, 2026 — The day we say I do",
+    "images": [
+      {
+        "id": "wd-1",
+        "src": "https://images.unsplash.com/photo-1516589178581-6ec78340e04a?w=800&q=80",
+        "caption": "Dreaming of this day",
+        "date": "2026-07-05"
+      }
+    ]
+  },
+  "yearHighlights": [
+    {
+      "id": "yh-1",
+      "year": 1,
+      "label": "Chapter One — Before the Wedding",
+      "photos": [
+        {
+          "id": "hl-1",
+          "src": "https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?w=800&q=80",
+          "caption": "Adventures that made us smile"
+        },
+        {
+          "id": "hl-2",
+          "src": "https://images.unsplash.com/photo-1519741497674-611481863552?w=800&q=80",
+          "caption": "Every moment, a memory"
+        }
+      ]
+    }
+  ],
+  "anniversaryMessages": [
+    {
+      "id": "am-1",
+      "year": 0,
+      "title": "Before Our Wedding",
+      "date": "2026-06-28",
+      "message": "We haven't walked down the aisle yet — but every day with you already feels like a celebration. See you at the altar, my love."
+    }
+  ],
+  "videos": [],
+  "months": [
+    {
+      "id": "2026-06",
+      "label": "June 2026",
+      "images": [
+        {
+          "id": "img-1",
+          "src": "https://images.unsplash.com/photo-1529636798458-92179e477f6c?w=800&q=80",
+          "caption": "Final preparations — so close now",
+          "date": "2026-06-20"
+        }
+      ]
+    },
+    {
+      "id": "2026-05",
+      "label": "May 2026",
+      "images": [
+        {
+          "id": "img-2",
+          "src": "https://images.unsplash.com/photo-1522673606300-8d9631bd15b4?w=800&q=80",
+          "caption": "Venue visit — it's really happening",
+          "date": "2026-05-15"
+        }
+      ]
+    }
+  ]
+}

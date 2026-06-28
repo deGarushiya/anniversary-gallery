@@ -1,0 +1,27 @@
+{
+  "name": "anniversary-gallery",
+  "version": "1.0.0",
+  "description": "A minimalist wedding-themed anniversary photo gallery",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:vite\"",
+    "dev:vite": "vite",
+    "dev:server": "node server/admin-api.js",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "keywords": [
+    "anniversary",
+    "gallery",
+    "wedding"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^9.2.3",
+    "cors": "^2.8.6",
+    "express": "^4.22.2",
+    "multer": "^1.4.5-lts.1",
+    "vite": "^6.4.3"
+  }
+}

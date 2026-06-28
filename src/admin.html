@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Login — Anniversary Gallery</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/admin.css" />
+</head>
+<body class="login-page">
+  <div class="login" id="login-screen">
+    <div class="login__card">
+      <h1 class="login__title">Gallery Admin</h1>
+      <p class="login__hint">Enter password to manage photos</p>
+      <form id="login-form">
+        <input type="password" id="login-password" class="input" placeholder="Password" autocomplete="current-password" required />
+        <p class="login__error" id="login-error" hidden></p>
+        <button type="submit" class="btn btn--primary">Enter Dashboard</button>
+      </form>
+      <p class="login__note">Default password: <code>love2025</code></p>
+      <p class="login__warning" id="js-warning" hidden>
+        JavaScript didn't load. Run <code>npm run dev</code> and open
+        <a href="http://localhost:5173/admin.html">http://localhost:5173/admin.html</a>
+      </p>
+      <a href="/" class="login__back">&larr; Back to gallery</a>
+    </div>
+  </div>
+
+  <script>
+    setTimeout(function () {
+      if (!window.__adminLoaded) {
+        var w = document.getElementById('js-warning');
+        if (w) w.hidden = false;
+      }
+    }, 800);
+  </script>
+  <script type="module" src="/js/admin-login.js"></script>
+</body>
+</html>

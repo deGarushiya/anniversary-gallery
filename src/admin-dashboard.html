@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard — Anniversary Gallery</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/admin.css" />
+</head>
+<body>
+  <div class="admin-layout">
+    <aside class="sidebar">
+      <h1 class="sidebar__title">Gallery Admin</h1>
+      <nav class="sidebar__nav" id="sidebar-nav">
+        <button class="sidebar__btn sidebar__btn--active" data-tab="settings">Settings</button>
+        <button class="sidebar__btn" data-tab="featured">Featured Photo</button>
+        <button class="sidebar__btn" data-tab="timeline">Timeline</button>
+        <button class="sidebar__btn" data-tab="thennow">Then & Now</button>
+        <button class="sidebar__btn" data-tab="wedding">Wedding Day</button>
+        <button class="sidebar__btn" data-tab="highlights">Highlights</button>
+        <button class="sidebar__btn" data-tab="quotes">Quotes</button>
+        <button class="sidebar__btn" data-tab="places">Places</button>
+        <button class="sidebar__btn" data-tab="letter">Love Letter</button>
+        <button class="sidebar__btn" data-tab="song">Our Song</button>
+        <button class="sidebar__btn" data-tab="messages">Messages</button>
+        <button class="sidebar__btn" data-tab="videos">Videos</button>
+        <button class="sidebar__btn" data-tab="gallery">Gallery</button>
+        <button class="sidebar__btn" data-tab="password">Site Password</button>
+      </nav>
+      <div class="sidebar__footer">
+        <a href="/" class="btn btn--ghost btn--block" target="_blank">View Site</a>
+        <button class="btn btn--ghost btn--block" id="logout-btn">Logout</button>
+      </div>
+    </aside>
+
+    <main class="admin-main">
+      <!-- Settings -->
+      <section class="tab-panel tab-panel--active" id="tab-settings">
+        <h2 class="tab-panel__title">Site Settings</h2>
+        <form class="form-grid" id="settings-form">
+          <label class="field"><span>Gallery Title</span><input type="text" id="setting-title" class="input" required /></label>
+          <label class="field"><span>Subtitle</span><input type="text" id="setting-subtitle" class="input" /></label>
+          <label class="field"><span>Wedding Date</span><input type="date" id="setting-wedding" class="input" /></label>
+          <label class="field"><span>Together Since</span><input type="date" id="setting-together" class="input" /></label>
+          <div class="field field--action"><button type="submit" class="btn btn--primary">Save Settings</button></div>
+        </form>
+      </section>
+
+      <!-- Featured -->
+      <section class="tab-panel" id="tab-featured">
+        <h2 class="tab-panel__title">Featured Photo</h2>
+        <form id="featured-form">
+          <label class="field field--full"><span>Caption</span><input type="text" id="featured-caption" class="input" /></label>
+          <label class="field field--full"><span>Image</span><input type="file" id="featured-file" accept="image/*" class="input" /></label>
+          <div id="featured-preview" class="preview-box"></div>
+          <button type="submit" class="btn btn--primary">Save Featured Photo</button>
+        </form>
+      </section>
+
+      <!-- Timeline -->
+      <section class="tab-panel" id="tab-timeline">
+        <h2 class="tab-panel__title">Our Story Timeline</h2>
+        <form class="form-grid" id="timeline-add-form">
+          <label class="field"><span>Date</span><input type="date" id="tl-date" class="input" required /></label>
+          <label class="field"><span>Title</span><input type="text" id="tl-title" class="input" required /></label>
+          <label class="field field--full"><span>Description</span><textarea id="tl-desc" class="input textarea" rows="2"></textarea></label>
+          <label class="field"><span><input type="checkbox" id="tl-upcoming" /> Upcoming event</span></label>
+          <div class="field field--action"><button type="submit" class="btn btn--primary">Add Event</button></div>
+        </form>
+        <div id="timeline-list" class="admin-list"></div>
+        <button class="btn btn--primary" id="timeline-save">Save Timeline</button>
+      </section>
+
+      <!-- Then & Now -->
+      <section class="tab-panel" id="tab-thennow">
+        <h2 class="tab-panel__title">Then & Now</h2>
+        <div class="form-grid">
+          <form id="then-form">
+            <h3 class="sub-title">Then</h3>
+            <label class="field field--full"><span>Caption</span><input type="text" id="then-caption" class="input" /></label>
+            <label class="field field--full"><span>Photo</span><input type="file" id="then-file" accept="image/*" class="input" /></label>
+            <div id="then-preview" class="preview-box"></div>
+            <button type="submit" class="btn btn--primary">Save Then</button>
+          </form>
+          <form id="now-form">
+            <h3 class="sub-title">Now</h3>
+            <label class="field field--full"><span>Caption</span><input type="text" id="now-caption" class="input" /></label>
+            <label class="field field--full"><span>Photo</span><input type="file" id="now-file" accept="image/*" class="input" /></label>
+            <div id="now-preview" class="preview-box"></div>
+            <button type="submit" class="btn btn--primary">Save Now</button>
+          </form>
+        </div>
+      </section>
+
+      <!-- Wedding -->
+      <section class="tab-panel" id="tab-wedding">
+        <h2 class="tab-panel__title">Wedding Day</h2>
+        <form class="form-grid" id="wedding-meta-form">
+          <label class="field"><span>Section Title</span><input type="text" id="wedding-title" class="input" /></label>
+          <label class="field"><span>Subtitle</span><input type="text" id="wedding-subtitle" class="input" /></label>
+          <div class="field field--action"><button type="submit" class="btn btn--primary">Save</button></div>
+        </form>
+        <hr class="divider" />
+        <form id="wedding-upload-form">
+          <label class="field"><span>Caption</span><input type="text" id="wedding-caption" class="input" /></label>
+          <label class="field"><span>Date</span><input type="date" id="wedding-date" class="input" /></label>
+          <label class="field field--full"><span>Photo</span><input type="file" id="wedding-file" accept="image/*" class="input" required /></label>
+          <button type="submit" class="btn btn--primary">Upload Wedding Photo</button>
+        </form>
+        <div id="wedding-list" class="admin-list"></div>
+      </section>
+
+      <!-- Highlights -->
+      <section class="tab-panel" id="tab-highlights">
+        <h2 class="tab-panel__title">Year Highlights</h2>
+        <form class="form-inline" id="highlight-add-form">
+          <label class="field"><span>Year #</span><input type="number" id="hl-year" class="input" min="0" value="1" /></label>
+          <label class="field"><span>Label</span><input type="text" id="hl-label" class="input" placeholder="Chapter One" required /></label>
+          <button type="submit" class="btn btn--primary">Add Chapter</button>
+        </form>
+        <div id="highlights-admin"></div>
+      </section>
+
+      <!-- Quotes -->
+      <section class="tab-panel" id="tab-quotes">
+        <h2 class="tab-panel__title">Quotes & Moments</h2>
+        <form class="form-grid" id="quote-add-form">
+          <label class="field field--full"><span>Quote</span><textarea id="quote-text" class="input textarea" rows="2" required></textarea></label>
+          <label class="field"><span>Date</span><input type="date" id="quote-date" class="input" /></label>
+          <div class="field field--action"><button type="submit" class="btn btn--primary">Add Quote</button></div>
+        </form>
+        <div id="quotes-list" class="admin-list"></div>
+        <button class="btn btn--primary" id="quotes-save">Save Quotes</button>
+      </section>
+
+      <!-- Places -->
+      <section class="tab-panel" id="tab-places">
+        <h2 class="tab-panel__title">Our Places</h2>
+        <form class="form-grid" id="place-add-form">
+          <label class="field"><span>Name</span><input type="text" id="place-name" class="input" required /></label>
+          <label class="field"><span>Location</span><input type="text" id="place-location" class="input" /></label>
+          <label class="field field--full"><span>Description</span><textarea id="place-desc" class="input textarea" rows="2"></textarea></label>
+          <div class="field field--action"><button type="submit" class="btn btn--primary">Add Place</button></div>
+        </form>
+        <div id="places-list" class="admin-list"></div>
+        <button class="btn btn--primary" id="places-save">Save Places</button>
+      </section>
+
+      <!-- Letter -->
+      <section class="tab-panel" id="tab-letter">
+        <h2 class="tab-panel__title">Love Letter</h2>
+        <form id="letter-form">
+          <label class="field field--full"><span>Title</span><input type="text" id="letter-title" class="input" /></label>
+          <label class="field field--full"><span>Content</span><textarea id="letter-content" class="input textarea" rows="8"></textarea></label>
+          <button type="submit" class="btn btn--primary">Save Letter</button>
+        </form>
+      </section>
+
+      <!-- Song -->
+      <section class="tab-panel" id="tab-song">
+        <h2 class="tab-panel__title">Our Song</h2>
+        <form class="form-grid" id="song-form">
+          <label class="field"><span>Title</span><input type="text" id="song-title" class="input" /></label>
+          <label class="field"><span>Artist</span><input type="text" id="song-artist" class="input" /></label>
+          <label class="field field--full"><span>Spotify / Link URL</span><input type="url" id="song-url" class="input" placeholder="https://open.spotify.com/..." /></label>
+          <div class="field field--action"><button type="submit" class="btn btn--primary">Save Song</button></div>
+        </form>
+      </section>
+
+      <!-- Messages -->
+      <section class="tab-panel" id="tab-messages">
+        <h2 class="tab-panel__title">Letters & Messages</h2>
+        <form class="form-grid" id="message-add-form">
+          <label class="field"><span>Title</span><input type="text" id="msg-title" class="input" required /></label>
+          <label class="field"><span>Date</span><input type="date" id="msg-date" class="input" /></label>
+          <label class="field field--full"><span>Message</span><textarea id="msg-text" class="input textarea" rows="4" required></textarea></label>
+          <div class="field field--action"><button type="submit" class="btn btn--primary">Add Message</button></div>
+        </form>
+        <div id="messages-list" class="admin-list"></div>
+        <button class="btn btn--primary" id="messages-save">Save Messages</button>
+      </section>
+
+      <!-- Videos -->
+      <section class="tab-panel" id="tab-videos">
+        <h2 class="tab-panel__title">Videos</h2>
+        <form class="form-grid" id="video-add-form">
+          <label class="field"><span>Title</span><input type="text" id="video-title" class="input" required /></label>
+          <label class="field field--full"><span>YouTube Embed URL</span><input type="url" id="video-url" class="input" placeholder="https://www.youtube.com/embed/..." required /></label>
+          <label class="field field--full"><span>Caption</span><input type="text" id="video-caption" class="input" /></label>
+          <div class="field field--action"><button type="submit" class="btn btn--primary">Add Video</button></div>
+        </form>
+        <div id="videos-list" class="admin-list"></div>
+        <button class="btn btn--primary" id="videos-save">Save Videos</button>
+      </section>
+
+      <!-- Gallery -->
+      <section class="tab-panel" id="tab-gallery">
+        <h2 class="tab-panel__title">Monthly Gallery</h2>
+        <form class="form-inline" id="add-month-form">
+          <label class="field"><span>Month ID</span><input type="text" id="month-id" class="input" pattern="\d{4}-\d{2}" placeholder="2026-07" required /></label>
+          <label class="field"><span>Label</span><input type="text" id="month-label" class="input" placeholder="July 2026" required /></label>
+          <button type="submit" class="btn btn--primary">Add Month</button>
+        </form>
+        <form class="form-grid" id="upload-form">
+          <label class="field"><span>Month</span><select id="upload-month" class="input" required></select></label>
+          <label class="field"><span>Caption</span><input type="text" id="upload-caption" class="input" /></label>
+          <label class="field"><span>Date</span><input type="date" id="upload-date" class="input" /></label>
+          <label class="field field--full"><span>Image</span><input type="file" id="upload-file" accept="image/*" class="input" required /></label>
+          <div class="field field--action"><button type="submit" class="btn btn--primary" id="upload-btn">Upload Photo</button></div>
+        </form>
+        <div id="manage-list"></div>
+      </section>
+
+      <!-- Password -->
+      <section class="tab-panel" id="tab-password">
+        <h2 class="tab-panel__title">Site Password</h2>
+        <p class="tab-panel__hint">Leave empty to make the site public. Set a password to lock the gallery.</p>
+        <form id="password-form">
+          <label class="field field--full"><span>Site Password</span><input type="text" id="site-password" class="input" placeholder="Leave empty for public access" /></label>
+          <button type="submit" class="btn btn--primary">Save Password</button>
+        </form>
+      </section>
+    </main>
+  </div>
+
+  <div class="toast" id="toast" hidden></div>
+  <script type="module" src="/js/admin-dashboard.js"></script>
+</body>
+</html>

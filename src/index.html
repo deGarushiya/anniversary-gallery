@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Our Love Story</title>
+  <meta name="description" content="Our journey to forever" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Jost:wght@300;400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/main.css" />
+</head>
+<body>
+  <!-- Site password gate -->
+  <div class="site-lock" id="site-lock" hidden>
+    <div class="site-lock__card torn-paper">
+      <div class="site-lock__ornament">♡</div>
+      <h2 class="site-lock__title">A Private Love Story</h2>
+      <p class="site-lock__hint">This gallery is just for us</p>
+      <form id="site-lock-form">
+        <input type="password" id="site-lock-password" class="input" placeholder="Enter password" required />
+        <button type="submit" class="btn btn--gold">Enter</button>
+      </form>
+      <p class="site-lock__error" id="site-lock-error" hidden></p>
+    </div>
+  </div>
+
+  <!-- Floating butterflies -->
+  <div class="butterflies" aria-hidden="true">
+    <svg class="butterfly butterfly--1" viewBox="0 0 64 48"><path d="M32 24c-8-12-20-14-24-8 6 2 10 8 10 14s-4 12-10 14c4 6 16 4 24-8z" fill="currentColor" opacity=".35"/><path d="M32 24c8-12 20-14 24-8-6 2-10 8-10 14s4 12 10 14c-4 6-16 4-24-8z" fill="currentColor" opacity=".35"/><ellipse cx="32" cy="24" rx="2" ry="10" fill="currentColor" opacity=".5"/></svg>
+    <svg class="butterfly butterfly--2" viewBox="0 0 64 48"><path d="M32 24c-8-12-20-14-24-8 6 2 10 8 10 14s-4 12-10 14c4 6 16 4 24-8z" fill="currentColor" opacity=".25"/><path d="M32 24c8-12 20-14 24-8-6 2-10 8-10 14s4 12 10 14c-4 6-16 4-24-8z" fill="currentColor" opacity=".25"/><ellipse cx="32" cy="24" rx="2" ry="10" fill="currentColor" opacity=".4"/></svg>
+    <svg class="butterfly butterfly--3" viewBox="0 0 64 48"><path d="M32 24c-8-12-20-14-24-8 6 2 10 8 10 14s-4 12-10 14c4 6 16 4 24-8z" fill="currentColor" opacity=".2"/><path d="M32 24c8-12 20-14 24-8-6 2-10 8-10 14s4 12 10 14c-4 6-16 4-24-8z" fill="currentColor" opacity=".2"/><ellipse cx="32" cy="24" rx="2" ry="10" fill="currentColor" opacity=".35"/></svg>
+  </div>
+
+  <div class="page" id="main-page">
+    <header class="hero torn-paper torn-paper--bottom">
+      <div class="hero__ornament" aria-hidden="true">✦</div>
+      <p class="hero__eyebrow" id="hero-eyebrow">Our Journey to Forever</p>
+      <h1 class="hero__title" id="site-title">Our Love Story</h1>
+      <p class="hero__subtitle" id="site-subtitle"></p>
+      <div class="hero__divider"></div>
+      <p class="hero__counter" id="days-counter"></p>
+      <p class="hero__countdown" id="wedding-countdown"></p>
+      <button class="btn btn--gold hero__slideshow-btn" id="slideshow-btn">▶ Watch Our Story</button>
+    </header>
+
+    <nav class="section-nav" id="section-nav" aria-label="Page sections"></nav>
+
+    <section class="section torn-paper torn-paper--both" id="section-featured">
+      <div class="section__inner" id="featured-content"></div>
+    </section>
+
+    <section class="section" id="section-timeline">
+      <div class="section__inner">
+        <header class="section__header">
+          <p class="section__eyebrow">How It All Began</p>
+          <h2 class="section__title">Our Story</h2>
+        </header>
+        <div class="timeline" id="timeline-content"></div>
+      </div>
+    </section>
+
+    <section class="section torn-paper torn-paper--both section--ivory" id="section-then-now">
+      <div class="section__inner">
+        <header class="section__header">
+          <p class="section__eyebrow">Through the Years</p>
+          <h2 class="section__title">Then &amp; Now</h2>
+        </header>
+        <div class="then-now" id="then-now-content"></div>
+      </div>
+    </section>
+
+    <section class="section" id="section-wedding">
+      <div class="section__inner">
+        <header class="section__header" id="wedding-header"></header>
+        <div class="photo-grid" id="wedding-content"></div>
+      </div>
+    </section>
+
+    <section class="section torn-paper torn-paper--both" id="section-highlights">
+      <div class="section__inner">
+        <header class="section__header">
+          <p class="section__eyebrow">Best Moments</p>
+          <h2 class="section__title">Year in Review</h2>
+        </header>
+        <div id="highlights-content"></div>
+      </div>
+    </section>
+
+    <section class="section section--ivory" id="section-quotes">
+      <div class="section__inner">
+        <header class="section__header">
+          <p class="section__eyebrow">Little Things</p>
+          <h2 class="section__title">Moments &amp; Words</h2>
+        </header>
+        <div class="quotes-grid" id="quotes-content"></div>
+      </div>
+    </section>
+
+    <section class="section torn-paper torn-paper--both" id="section-places">
+      <div class="section__inner">
+        <header class="section__header">
+          <p class="section__eyebrow">On the Map of Us</p>
+          <h2 class="section__title">Our Places</h2>
+        </header>
+        <div class="places-list" id="places-content"></div>
+      </div>
+    </section>
+
+    <section class="section" id="section-letter">
+      <div class="section__inner">
+        <div class="love-letter torn-paper" id="letter-content"></div>
+      </div>
+    </section>
+
+    <section class="section section--ivory" id="section-song">
+      <div class="section__inner" id="song-content"></div>
+    </section>
+
+    <section class="section torn-paper torn-paper--both" id="section-messages">
+      <div class="section__inner">
+        <header class="section__header">
+          <p class="section__eyebrow">Notes Through Time</p>
+          <h2 class="section__title">Letters to Each Other</h2>
+        </header>
+        <div class="messages-list" id="messages-content"></div>
+      </div>
+    </section>
+
+    <section class="section" id="section-videos">
+      <div class="section__inner">
+        <header class="section__header">
+          <p class="section__eyebrow">Moving Memories</p>
+          <h2 class="section__title">Videos</h2>
+        </header>
+        <div class="videos-grid" id="videos-content"></div>
+      </div>
+    </section>
+
+    <section class="section torn-paper torn-paper--top" id="section-gallery">
+      <div class="section__inner">
+        <header class="section__header">
+          <p class="section__eyebrow">Month by Month</p>
+          <h2 class="section__title">Our Gallery</h2>
+        </header>
+        <nav class="month-nav" id="month-nav" aria-label="Browse by month"></nav>
+        <main class="gallery" id="gallery"></main>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <p>Made with love &middot; Not married yet — but almost! &middot; <a href="/admin.html" class="footer__link">Admin</a></p>
+    </footer>
+  </div>
+
+  <!-- Lightbox -->
+  <div class="lightbox" id="lightbox" hidden>
+    <button class="lightbox__close" id="lightbox-close" aria-label="Close">&times;</button>
+    <button class="lightbox__nav lightbox__nav--prev" id="lightbox-prev" aria-label="Previous">&#8249;</button>
+    <button class="lightbox__nav lightbox__nav--next" id="lightbox-next" aria-label="Next">&#8250;</button>
+    <figure class="lightbox__content">
+      <img class="lightbox__img" id="lightbox-img" src="" alt="" />
+      <figcaption class="lightbox__caption" id="lightbox-caption"></figcaption>
+    </figure>
+  </div>
+
+  <!-- Slideshow -->
+  <div class="slideshow" id="slideshow" hidden>
+    <button class="slideshow__close" id="slideshow-close" aria-label="Close">&times;</button>
+    <img class="slideshow__img" id="slideshow-img" src="" alt="" />
+    <p class="slideshow__caption" id="slideshow-caption"></p>
+    <div class="slideshow__progress" id="slideshow-progress"></div>
+  </div>
+
+  <script type="module" src="/js/gallery.js"></script>
+</body>
+</html>
