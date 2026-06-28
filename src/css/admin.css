@@ -94,36 +94,6 @@ body.login-page {
 
 .login__back:hover { color: var(--charcoal); }
 
-.btn--google {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.65rem;
-  width: 100%;
-  background: var(--white);
-  color: var(--charcoal);
-  border: 1px solid var(--blush);
-  font-family: var(--font-sans);
-  font-size: 0.9rem;
-  padding: 0.65rem 1rem;
-  border-radius: var(--radius);
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.btn--google:hover {
-  border-color: var(--gold);
-  background: var(--cream);
-}
-
-.login__divider {
-  font-size: 0.75rem;
-  color: var(--muted);
-  margin: 1.25rem 0 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-}
-
 #email-login-form {
   display: flex;
   flex-direction: column;

@@ -1,9 +1,4 @@
 import {
-  isFirebaseConfigured,
-  watchAuth,
-  firebaseSignOut,
-} from './firebase-app.js';
-import {
   loadGallery,
   saveGallery,
   uploadImage,
@@ -11,7 +6,6 @@ import {
   deleteMonth,
   addMonth,
   uid,
-  usesFirebase,
 } from './gallery-api.js';
 
 const SESSION_KEY = 'gallery-admin-auth';
@@ -39,13 +33,11 @@ function initTabs() {
 async function loadGalleryData() {
   try {
     galleryData = await loadGallery();
-    if (!usesFirebase()) {
-      try {
-        const r = await fetch('/api/gallery');
-        if (!r.ok) throw new Error();
-      } catch {
-        showToast('Local mode — run npm run dev for file-based saves', true);
-      }
+    try {
+      const r = await fetch('/api/gallery');
+      if (!r.ok) throw new Error();
+    } catch {
+      showToast('Run npm run dev for file-based saves', true);
     }
   } catch (err) {
     showToast(err.message || 'Failed to load', true);
@@ -544,25 +536,14 @@ document.getElementById('upload-form').addEventListener('submit', async (e) => {
   } catch (err) { showToast(err.message, true); }
 });
 
-document.getElementById('logout-btn').addEventListener('click', async () => {
-  if (isFirebaseConfigured()) await firebaseSignOut();
-  else sessionStorage.removeItem(SESSION_KEY);
+document.getElementById('logout-btn').addEventListener('click', () => {
+  sessionStorage.removeItem(SESSION_KEY);
   window.location.href = `${import.meta.env.BASE_URL}admin.html`;
 });
 
-function startApp() {
+if (sessionStorage.getItem(SESSION_KEY) !== 'true') {
+  window.location.replace(`${import.meta.env.BASE_URL}admin.html`);
+} else {
   initTabs();
   loadGalleryData();
-}
-
-if (isFirebaseConfigured()) {
-  watchAuth((user) => {
-    if (!user) window.location.replace(`${import.meta.env.BASE_URL}admin.html`);
-    else startApp();
-  });
-} else {
-  if (sessionStorage.getItem(SESSION_KEY) !== 'true') {
-    window.location.replace(`${import.meta.env.BASE_URL}admin.html`);
-  }
-  startApp();
 }

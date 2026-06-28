@@ -24,7 +24,7 @@ npm run dev
 - **Gallery:** http://localhost:5173
 - **Admin:** http://localhost:5173/admin.html (login)
 - **Dashboard:** http://localhost:5173/admin-dashboard.html (after login)
-- **Admin password:** `love2025` (change in `src/js/admin.js`)
+- **Admin password:** `love2025` (change in `src/js/admin-login.js`)
 
 ## Admin Usage
 
@@ -35,6 +35,12 @@ npm run dev
 5. **Manage Photos** — View and delete photos or entire months
 
 > The admin API only runs during development (`npm run dev`). Uploaded images are saved to `public/images/` and metadata to `public/data/gallery.json`.
+
+## Update the live site
+
+1. Run `npm run dev` and make changes in the admin dashboard
+2. Commit the updated `public/data/gallery.json` and `public/images/` files
+3. Push to GitHub — Actions rebuilds and deploys automatically
 
 ## Deploy to GitHub Pages
 
@@ -107,7 +113,7 @@ anniversary-gallery/
 ## Customization
 
 - **Colors & fonts** — Edit CSS variables in `src/css/main.css`
-- **Admin password** — Change `ADMIN_PASSWORD` in `src/js/admin.js`
+- **Admin password** — Change `ADMIN_PASSWORD` in `src/js/admin-login.js`
 - **Sample data** — Edit `public/data/gallery.json`
 
 ## License

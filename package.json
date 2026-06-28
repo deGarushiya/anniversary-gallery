@@ -23,8 +23,5 @@
     "express": "^4.22.2",
     "multer": "^1.4.5-lts.1",
     "vite": "^6.4.3"
-  },
-  "dependencies": {
-    "firebase": "^12.15.0"
   }
 }
