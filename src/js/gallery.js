@@ -133,12 +133,31 @@ function renderFeatured() {
     document.getElementById('section-featured').hidden = true;
     return;
   }
+
+  const locked = fp.comingSoon !== false;
+  const lockLabel = fp.comingSoonLabel || 'Coming Soon';
+
   el.innerHTML = `
-    <div class="featured" data-image-id="featured">
+    <div class="featured${locked ? ' featured--locked' : ''}" data-image-id="featured">
       <img class="featured__img" src="${esc(fp.src)}" alt="${esc(fp.caption)}" loading="eager" />
-      ${fp.caption ? `<p class="featured__caption">${esc(fp.caption)}</p>` : ''}
+      ${locked ? `
+        <div class="featured__lock">
+          <div class="featured__lock-inner">
+            <svg class="featured__lock-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <rect x="5" y="11" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M8 11V8a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              <circle cx="12" cy="16" r="1.2" fill="currentColor"/>
+            </svg>
+            <p class="featured__lock-label">${esc(lockLabel)}</p>
+            <p class="featured__lock-hint">Our wedding photos await</p>
+          </div>
+        </div>` : ''}
+      ${fp.caption && !locked ? `<p class="featured__caption">${esc(fp.caption)}</p>` : ''}
     </div>`;
-  el.querySelector('.featured').addEventListener('click', () => openLightboxBySrc(fp.src, fp.caption));
+
+  if (!locked) {
+    el.querySelector('.featured').addEventListener('click', () => openLightboxBySrc(fp.src, fp.caption));
+  }
 }
 
 function renderTimeline() {
@@ -394,7 +413,9 @@ function buildLightboxList() {
     if (img?.src) allImages.push({ id: img.id || img.src, src: img.src, caption: caption || img.caption || '' });
   };
 
-  if (galleryData.featuredPhoto?.src) add(galleryData.featuredPhoto);
+  if (galleryData.featuredPhoto?.src && galleryData.featuredPhoto.comingSoon === false) {
+    add(galleryData.featuredPhoto);
+  }
   (galleryData.weddingDay?.images || []).forEach((i) => add(i));
   (galleryData.yearHighlights || []).forEach((b) => (b.photos || []).forEach((p) => add(p)));
   (galleryData.months || []).forEach((m) => m.images.forEach((i) => add(i)));

@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 110" fill="none">
+  <defs>
+    <filter id="soft"><feGaussianBlur stdDeviation="0.5"/></filter>
+    <linearGradient id="cr" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fff8e8"/>
+      <stop offset="50%" stop-color="#f0e8c8"/>
+      <stop offset="100%" stop-color="#e0d0a0"/>
+    </linearGradient>
+    <linearGradient id="cr2" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#faf0d8"/>
+      <stop offset="100%" stop-color="#d8c890"/>
+    </linearGradient>
+  </defs>
+  <g filter="url(#soft)" opacity="0.88">
+    <path d="M60 52 C32 12 5 15 8 40 C20 44 32 48 36 52 C30 56 14 65 10 78 C14 95 40 85 60 52Z" fill="url(#cr)" stroke="#b0a070" stroke-width="0.5"/>
+    <path d="M60 52 C88 12 115 15 112 40 C100 44 88 48 84 52 C90 56 106 65 110 78 C106 95 80 85 60 52Z" fill="url(#cr2)" stroke="#b0a070" stroke-width="0.5"/>
+    <path d="M36 52 L60 90 L84 52" stroke="#b0a070" stroke-width="0.4" fill="none" opacity="0.5"/>
+    <path d="M42 48 L60 85 L78 48" stroke="#c0b080" stroke-width="0.3" fill="none" opacity="0.4"/>
+    <path d="M18 38 Q28 52 18 68" stroke="#a09060" stroke-width="0.35" fill="none" opacity="0.5"/>
+    <path d="M102 38 Q92 52 102 68" stroke="#a09060" stroke-width="0.35" fill="none" opacity="0.5"/>
+    <ellipse cx="60" cy="52" rx="2" ry="16" fill="#3a3020"/>
+    <circle cx="60" cy="36" r="3" fill="#2a2018"/>
+    <path d="M57 33 Q60 28 63 33" stroke="#2a2018" stroke-width="0.4" fill="none"/>
+    <path d="M60 90 L58 100 M60 90 L62 100" stroke="#3a3020" stroke-width="0.5"/>
+  </g>
+</svg>

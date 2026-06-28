@@ -59,6 +59,8 @@ function populateAll() {
   document.getElementById('setting-wedding').value = galleryData.weddingDate || '';
   document.getElementById('setting-together').value = galleryData.togetherSince || '';
   document.getElementById('featured-caption').value = galleryData.featuredPhoto?.caption || '';
+  document.getElementById('featured-coming-soon').checked = galleryData.featuredPhoto?.comingSoon !== false;
+  document.getElementById('featured-lock-label').value = galleryData.featuredPhoto?.comingSoonLabel || 'Coming Soon';
   if (galleryData.featuredPhoto?.src) {
     document.getElementById('featured-preview').innerHTML = `<img src="${galleryData.featuredPhoto.src}" alt="" />`;
   }
@@ -113,13 +115,24 @@ document.getElementById('featured-form').addEventListener('submit', async (e) =>
   if (file) fd.append('image', file);
   else if (!galleryData.featuredPhoto?.src) { showToast('Select an image', true); return; }
   try {
+    const featuredPhoto = {
+      ...galleryData.featuredPhoto,
+      caption: document.getElementById('featured-caption').value,
+      comingSoon: document.getElementById('featured-coming-soon').checked,
+      comingSoonLabel: document.getElementById('featured-lock-label').value || 'Coming Soon',
+    };
     if (file) {
       galleryData = (await uploadImage(fd)).gallery;
+      galleryData = await api('/gallery/meta', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ featuredPhoto: { ...galleryData.featuredPhoto, ...featuredPhoto } }),
+      });
     } else {
       galleryData = await api('/gallery/meta', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ featuredPhoto: { ...galleryData.featuredPhoto, caption: document.getElementById('featured-caption').value } }),
+        body: JSON.stringify({ featuredPhoto }),
       });
     }
     populateAll();
