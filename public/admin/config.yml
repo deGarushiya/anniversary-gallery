@@ -1,0 +1,182 @@
+# Anniversary Gallery — Decap CMS
+# Mobile-friendly editor. Saves to public/data/gallery.json and public/images/
+# Setup: see DECAP_SETUP.md (one-time GitHub OAuth)
+
+local_backend: true
+
+backend:
+  name: github
+  repo: deGarushiya/anniversary-gallery
+  branch: master
+  base_url: https://api.netlify.com
+  auth_endpoint: auth
+  commit_messages:
+    update: 'Update gallery content'
+    uploadMedia: 'Upload image "{{path}}"'
+
+site_url: https://degarushiya.github.io
+display_url: https://degarushiya.github.io/anniversary-gallery/
+
+media_folder: public/images
+public_folder: /images
+
+collections:
+  - name: gallery
+    label: Gallery
+    files:
+      - name: main
+        label: Gallery Content
+        file: public/data/gallery.json
+        fields:
+          - { label: Title, name: title, widget: string }
+          - { label: Subtitle, name: subtitle, widget: string }
+          - { label: Wedding Date, name: weddingDate, widget: datetime, format: YYYY-MM-DD, date_format: YYYY-MM-DD, time_format: false }
+          - { label: Together Since, name: togetherSince, widget: datetime, format: YYYY-MM-DD, date_format: YYYY-MM-DD, time_format: false }
+          - { label: Site Password (optional), name: sitePassword, widget: string, required: false, hint: 'Leave empty to disable visitor password' }
+
+          - label: Featured Photo
+            name: featuredPhoto
+            widget: object
+            collapsed: true
+            fields:
+              - { label: Image, name: src, widget: image, required: false }
+              - { label: Caption, name: caption, widget: string, required: false }
+              - { label: Coming Soon overlay, name: comingSoon, widget: boolean, default: false }
+              - { label: Coming Soon label, name: comingSoonLabel, widget: string, default: 'Coming Soon', required: false }
+
+          - label: Photo Gallery by Month
+            name: months
+            widget: list
+            summary: '{{label}}'
+            fields:
+              - { label: Month ID, name: id, widget: string, hint: 'Format YYYY-MM, e.g. 2026-07' }
+              - { label: Label, name: label, widget: string, hint: 'e.g. July 2026' }
+              - label: Photos
+                name: images
+                widget: list
+                summary: '{{caption}}'
+                fields:
+                  - { label: ID, name: id, widget: string, required: false, hint: 'Optional — leave blank for new photos' }
+                  - { label: Photo, name: src, widget: image }
+                  - { label: Caption, name: caption, widget: string, required: false }
+                  - { label: Date, name: date, widget: datetime, format: YYYY-MM-DD, date_format: YYYY-MM-DD, time_format: false, required: false }
+
+          - label: Then & Now
+            name: thenAndNow
+            widget: object
+            collapsed: true
+            fields:
+              - label: Then
+                name: then
+                widget: object
+                fields:
+                  - { label: Image, name: src, widget: image, required: false }
+                  - { label: Caption, name: caption, widget: string, required: false }
+              - label: Now
+                name: now
+                widget: object
+                fields:
+                  - { label: Image, name: src, widget: image, required: false }
+                  - { label: Caption, name: caption, widget: string, required: false }
+
+          - label: Wedding Day
+            name: weddingDay
+            widget: object
+            collapsed: true
+            fields:
+              - { label: Title, name: title, widget: string, required: false }
+              - { label: Subtitle, name: subtitle, widget: string, required: false }
+              - label: Photos
+                name: images
+                widget: list
+                summary: '{{caption}}'
+                fields:
+                  - { label: ID, name: id, widget: string, required: false }
+                  - { label: Photo, name: src, widget: image }
+                  - { label: Caption, name: caption, widget: string, required: false }
+                  - { label: Date, name: date, widget: datetime, format: YYYY-MM-DD, date_format: YYYY-MM-DD, time_format: false, required: false }
+
+          - label: Year Highlights
+            name: yearHighlights
+            widget: list
+            summary: '{{label}}'
+            fields:
+              - { label: ID, name: id, widget: string, required: false }
+              - { label: Year number, name: year, widget: number }
+              - { label: Label, name: label, widget: string }
+              - label: Photos
+                name: photos
+                widget: list
+                summary: '{{caption}}'
+                fields:
+                  - { label: ID, name: id, widget: string, required: false }
+                  - { label: Photo, name: src, widget: image }
+                  - { label: Caption, name: caption, widget: string, required: false }
+
+          - label: Our Story Timeline
+            name: timeline
+            widget: list
+            summary: '{{title}}'
+            fields:
+              - { label: ID, name: id, widget: string, required: false }
+              - { label: Date, name: date, widget: datetime, format: YYYY-MM-DD, date_format: YYYY-MM-DD, time_format: false }
+              - { label: Title, name: title, widget: string }
+              - { label: Description, name: description, widget: text }
+              - { label: Image, name: image, widget: image, required: false }
+              - { label: Upcoming, name: upcoming, widget: boolean, default: false, required: false }
+
+          - label: Quotes
+            name: quotes
+            widget: list
+            summary: '{{text}}'
+            fields:
+              - { label: ID, name: id, widget: string, required: false }
+              - { label: Quote, name: text, widget: text }
+              - { label: Date, name: date, widget: datetime, format: YYYY-MM-DD, date_format: YYYY-MM-DD, time_format: false, required: false }
+
+          - label: Places
+            name: places
+            widget: list
+            summary: '{{name}}'
+            fields:
+              - { label: ID, name: id, widget: string, required: false }
+              - { label: Name, name: name, widget: string }
+              - { label: Location, name: location, widget: string }
+              - { label: Description, name: description, widget: text }
+
+          - label: Love Letter
+            name: loveLetter
+            widget: object
+            collapsed: true
+            fields:
+              - { label: Title, name: title, widget: string, required: false }
+              - { label: Content, name: content, widget: text }
+
+          - label: Our Song
+            name: ourSong
+            widget: object
+            collapsed: true
+            fields:
+              - { label: Title, name: title, widget: string, required: false }
+              - { label: Artist, name: artist, widget: string, required: false }
+              - { label: Spotify / URL, name: url, widget: string, required: false }
+
+          - label: Anniversary Messages
+            name: anniversaryMessages
+            widget: list
+            summary: '{{title}}'
+            fields:
+              - { label: ID, name: id, widget: string, required: false }
+              - { label: Year, name: year, widget: number }
+              - { label: Title, name: title, widget: string }
+              - { label: Date, name: date, widget: datetime, format: YYYY-MM-DD, date_format: YYYY-MM-DD, time_format: false, required: false }
+              - { label: Message, name: message, widget: text }
+
+          - label: Videos
+            name: videos
+            widget: list
+            summary: '{{title}}'
+            fields:
+              - { label: ID, name: id, widget: string, required: false }
+              - { label: Title, name: title, widget: string }
+              - { label: YouTube / embed URL, name: url, widget: string }

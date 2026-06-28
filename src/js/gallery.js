@@ -2,6 +2,13 @@ import { loadGallery } from './gallery-api.js';
 
 const SITE_AUTH_KEY = 'gallery-site-auth';
 
+function assetUrl(src) {
+  if (!src) return '';
+  if (/^https?:\/\//i.test(src)) return src;
+  const path = src.startsWith('/') ? src.slice(1) : src;
+  return `${import.meta.env.BASE_URL}${path}`;
+}
+
 let galleryData = null;
 let allImages = [];
 let currentLightboxIndex = 0;
@@ -140,7 +147,7 @@ function renderFeatured() {
 
   el.innerHTML = `
     <div class="featured${locked ? ' featured--locked' : ''}" data-image-id="featured">
-      <img class="featured__img" src="${esc(fp.src)}" alt="${esc(fp.caption)}" loading="eager" />
+      <img class="featured__img" src="${esc(assetUrl(fp.src))}" alt="${esc(fp.caption)}" loading="eager" />
       ${locked ? `
         <div class="featured__lock">
           <div class="featured__lock-inner">
@@ -174,7 +181,7 @@ function renderTimeline() {
       <h3 class="timeline__title">${esc(item.title)}</h3>
       <p class="timeline__desc">${esc(item.description)}</p>
       ${item.upcoming ? '<span class="timeline__badge">Coming Soon</span>' : ''}
-      ${item.image ? `<img class="timeline__img" src="${esc(item.image)}" alt="${esc(item.title)}" data-src="${esc(item.image)}" data-caption="${esc(item.title)}" />` : ''}
+      ${item.image ? `<img class="timeline__img" src="${esc(assetUrl(item.image))}" alt="${esc(item.title)}" data-src="${esc(item.image)}" data-caption="${esc(item.title)}" />` : ''}
     </div>`).join('');
 
   el.querySelectorAll('.timeline__img').forEach((img) => {
@@ -196,7 +203,7 @@ function renderThenNow() {
       <article class="then-now__card">
         <p class="then-now__label">${key === 'then' ? 'Then' : 'Now'}</p>
         <div class="then-now__img-wrap">
-          <img class="then-now__img" src="${esc(side.src)}" alt="${esc(side.caption)}" />
+          <img class="then-now__img" src="${esc(assetUrl(side.src))}" alt="${esc(side.caption)}" />
         </div>
         ${side.caption ? `<p class="then-now__caption">${esc(side.caption)}</p>` : ''}
       </article>`;
@@ -243,7 +250,7 @@ function renderHighlights() {
       <h3 class="highlight-block__title">${esc(block.label)}</h3>
       <div class="photo-grid">${(block.photos || []).map((p) => `
         <article class="photo-card" data-id="${esc(p.id)}">
-          <div class="photo-card__img-wrap"><img class="photo-card__img" src="${esc(p.src)}" alt="${esc(p.caption)}" loading="lazy" /></div>
+          <div class="photo-card__img-wrap"><img class="photo-card__img" src="${esc(assetUrl(p.src))}" alt="${esc(p.caption)}" loading="lazy" data-src="${esc(p.src)}" /></div>
           ${p.caption ? `<div class="photo-card__info"><p class="photo-card__caption">${esc(p.caption)}</p></div>` : ''}
         </article>`).join('')}</div>
     </div>`).join('');
@@ -251,7 +258,7 @@ function renderHighlights() {
   el.querySelectorAll('.photo-card').forEach((card) => {
     card.addEventListener('click', () => {
       const img = card.querySelector('img');
-      openLightboxBySrc(img.src, card.querySelector('.photo-card__caption')?.textContent || '');
+      openLightboxBySrc(card.querySelector('img')?.dataset.src || img.src, card.querySelector('.photo-card__caption')?.textContent || '');
     });
   });
 }
@@ -398,7 +405,7 @@ function createPhotoCard(img) {
   card.className = 'photo-card';
   card.innerHTML = `
     <div class="photo-card__img-wrap">
-      <img class="photo-card__img" src="${esc(img.src)}" alt="${esc(img.caption || 'Photo')}" loading="lazy" />
+      <img class="photo-card__img" src="${esc(assetUrl(img.src))}" alt="${esc(img.caption || 'Photo')}" loading="lazy" data-src="${esc(img.src)}" />
     </div>
     <div class="photo-card__info">
       ${img.caption ? `<p class="photo-card__caption">${esc(img.caption)}</p>` : ''}
@@ -411,7 +418,14 @@ function createPhotoCard(img) {
 function buildLightboxList() {
   allImages = [];
   const add = (img, caption) => {
-    if (img?.src) allImages.push({ id: img.id || img.src, src: img.src, caption: caption || img.caption || '' });
+    if (img?.src) {
+      allImages.push({
+        id: img.id || img.src,
+        rawSrc: img.src,
+        src: assetUrl(img.src),
+        caption: caption || img.caption || '',
+      });
+    }
   };
 
   if (galleryData.featuredPhoto?.src && galleryData.featuredPhoto.comingSoon === false) {
@@ -433,9 +447,9 @@ function openLightbox(imageId) {
 }
 
 function openLightboxBySrc(src, caption) {
-  currentLightboxIndex = allImages.findIndex((i) => i.src === src);
+  currentLightboxIndex = allImages.findIndex((i) => i.rawSrc === src || i.src === src);
   if (currentLightboxIndex === -1) {
-    allImages.push({ id: src, src, caption: caption || '' });
+    allImages.push({ id: src, rawSrc: src, src: assetUrl(src), caption: caption || '' });
     currentLightboxIndex = allImages.length - 1;
   }
   showLightboxImage();

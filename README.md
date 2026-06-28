@@ -36,7 +36,14 @@ npm run dev
 
 > The admin API only runs during development (`npm run dev`). Uploaded images are saved to `public/images/` and metadata to `public/data/gallery.json`.
 
-## Update the live site
+## Mobile admin (Supabase)
+
+Upload from your phone — photos appear instantly on the live site. See **[SUPABASE_SETUP.md](SUPABASE_SETUP.md)** for one-time setup (free, ~15 min).
+
+- **Live admin:** `/admin.html` → sign in with email
+- **Local fallback:** password `love2025` when `.env` is not configured
+
+## Update the live site (local mode only)
 
 1. Run `npm run dev` and make changes in the admin dashboard
 2. Commit the updated `public/data/gallery.json` and `public/images/` files

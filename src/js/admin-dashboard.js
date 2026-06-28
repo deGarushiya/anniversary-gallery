@@ -1,4 +1,10 @@
 import {
+  isSupabaseConfigured,
+  onAuthChange,
+  supabaseSignOut,
+  getSupabase,
+} from './supabase-app.js';
+import {
   loadGallery,
   saveGallery,
   uploadImage,
@@ -6,6 +12,7 @@ import {
   deleteMonth,
   addMonth,
   uid,
+  usesSupabase,
 } from './gallery-api.js';
 
 const SESSION_KEY = 'gallery-admin-auth';
@@ -33,11 +40,13 @@ function initTabs() {
 async function loadGalleryData() {
   try {
     galleryData = await loadGallery();
-    try {
-      const r = await fetch('/api/gallery');
-      if (!r.ok) throw new Error();
-    } catch {
-      showToast('Run npm run dev for file-based saves', true);
+    if (!usesSupabase()) {
+      try {
+        const r = await fetch('/api/gallery');
+        if (!r.ok) throw new Error();
+      } catch {
+        showToast('Run npm run dev for file-based saves', true);
+      }
     }
   } catch (err) {
     showToast(err.message || 'Failed to load', true);
@@ -536,14 +545,27 @@ document.getElementById('upload-form').addEventListener('submit', async (e) => {
   } catch (err) { showToast(err.message, true); }
 });
 
-document.getElementById('logout-btn').addEventListener('click', () => {
-  sessionStorage.removeItem(SESSION_KEY);
+document.getElementById('logout-btn').addEventListener('click', async () => {
+  if (isSupabaseConfigured()) await supabaseSignOut();
+  else sessionStorage.removeItem(SESSION_KEY);
   window.location.href = `${import.meta.env.BASE_URL}admin.html`;
 });
 
-if (sessionStorage.getItem(SESSION_KEY) !== 'true') {
-  window.location.replace(`${import.meta.env.BASE_URL}admin.html`);
-} else {
+function startApp() {
   initTabs();
   loadGalleryData();
+}
+
+if (isSupabaseConfigured()) {
+  getSupabase().auth.getSession().then(({ data: { session } }) => {
+    if (!session) window.location.replace(`${import.meta.env.BASE_URL}admin.html`);
+    else startApp();
+  });
+  onAuthChange((user) => {
+    if (!user) window.location.replace(`${import.meta.env.BASE_URL}admin.html`);
+  });
+} else if (sessionStorage.getItem(SESSION_KEY) === 'true') {
+  startApp();
+} else {
+  window.location.replace(`${import.meta.env.BASE_URL}admin.html`);
 }
