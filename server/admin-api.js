@@ -66,6 +66,11 @@ const upload = multer({
 
 app.get('/api/gallery', (_req, res) => res.json(readGallery()));
 
+app.put('/api/gallery', (req, res) => {
+  writeGallery(req.body);
+  res.json(readGallery());
+});
+
 app.put('/api/gallery/meta', (req, res) => {
   const gallery = readGallery();
   const fields = [

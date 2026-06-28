@@ -1,34 +1,28 @@
+import {
+  isFirebaseConfigured,
+  watchAuth,
+  firebaseSignOut,
+} from './firebase-app.js';
+import {
+  loadGallery,
+  saveGallery,
+  uploadImage,
+  deleteImage,
+  deleteMonth,
+  addMonth,
+  uid,
+  usesFirebase,
+} from './gallery-api.js';
+
 const SESSION_KEY = 'gallery-admin-auth';
-
-if (sessionStorage.getItem(SESSION_KEY) !== 'true') {
-  window.location.replace('/admin.html');
-}
-
 const toast = document.getElementById('toast');
 let galleryData = null;
-
-function uid(p = 'id') {
-  return `${p}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
-}
-
-async function api(path, options = {}) {
-  const res = await fetch(`/api${path}`, options);
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.error || 'Request failed');
-  }
-  return res.json();
-}
 
 function showToast(msg, err = false) {
   toast.textContent = msg;
   toast.className = err ? 'toast toast--error' : 'toast';
   toast.hidden = false;
   setTimeout(() => { toast.hidden = true; }, 3000);
-}
-
-async function uploadImage(formData) {
-  return api('/upload', { method: 'POST', body: formData });
 }
 
 function initTabs() {
@@ -42,13 +36,20 @@ function initTabs() {
   });
 }
 
-async function loadGallery() {
+async function loadGalleryData() {
   try {
-    galleryData = await api('/gallery');
-  } catch {
-    const res = await fetch('/data/gallery.json');
-    galleryData = await res.json();
-    showToast('Read-only mode — run npm run dev for full admin', true);
+    galleryData = await loadGallery();
+    if (!usesFirebase()) {
+      try {
+        const r = await fetch('/api/gallery');
+        if (!r.ok) throw new Error();
+      } catch {
+        showToast('Local mode — run npm run dev for file-based saves', true);
+      }
+    }
+  } catch (err) {
+    showToast(err.message || 'Failed to load', true);
+    galleryData = { months: [] };
   }
   populateAll();
 }
@@ -61,13 +62,14 @@ function populateAll() {
   document.getElementById('featured-caption').value = galleryData.featuredPhoto?.caption || '';
   document.getElementById('featured-coming-soon').checked = galleryData.featuredPhoto?.comingSoon !== false;
   document.getElementById('featured-lock-label').value = galleryData.featuredPhoto?.comingSoonLabel || 'Coming Soon';
-  if (galleryData.featuredPhoto?.src) {
-    document.getElementById('featured-preview').innerHTML = `<img src="${galleryData.featuredPhoto.src}" alt="" />`;
-  }
+  document.getElementById('featured-preview').innerHTML = galleryData.featuredPhoto?.src
+    ? `<img src="${galleryData.featuredPhoto.src}" alt="" />` : '';
   document.getElementById('then-caption').value = galleryData.thenAndNow?.then?.caption || '';
   document.getElementById('now-caption').value = galleryData.thenAndNow?.now?.caption || '';
-  if (galleryData.thenAndNow?.then?.src) document.getElementById('then-preview').innerHTML = `<img src="${galleryData.thenAndNow.then.src}" alt="" />`;
-  if (galleryData.thenAndNow?.now?.src) document.getElementById('now-preview').innerHTML = `<img src="${galleryData.thenAndNow.now.src}" alt="" />`;
+  document.getElementById('then-preview').innerHTML = galleryData.thenAndNow?.then?.src
+    ? `<img src="${galleryData.thenAndNow.then.src}" alt="" />` : '';
+  document.getElementById('now-preview').innerHTML = galleryData.thenAndNow?.now?.src
+    ? `<img src="${galleryData.thenAndNow.now.src}" alt="" />` : '';
   document.getElementById('wedding-title').value = galleryData.weddingDay?.title || '';
   document.getElementById('wedding-subtitle').value = galleryData.weddingDay?.subtitle || '';
   document.getElementById('letter-title').value = galleryData.loveLetter?.title || '';
@@ -87,65 +89,43 @@ function populateAll() {
   renderGalleryAdmin();
 }
 
-/* ── Settings ── */
 document.getElementById('settings-form').addEventListener('submit', async (e) => {
   e.preventDefault();
   try {
-    galleryData = await api('/gallery/meta', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        title: document.getElementById('setting-title').value,
-        subtitle: document.getElementById('setting-subtitle').value,
-        weddingDate: document.getElementById('setting-wedding').value,
-        togetherSince: document.getElementById('setting-together').value,
-      }),
-    });
+    galleryData.title = document.getElementById('setting-title').value;
+    galleryData.subtitle = document.getElementById('setting-subtitle').value;
+    galleryData.weddingDate = document.getElementById('setting-wedding').value;
+    galleryData.togetherSince = document.getElementById('setting-together').value;
+    galleryData = await saveGallery(galleryData);
     showToast('Settings saved');
   } catch (err) { showToast(err.message, true); }
 });
 
-/* ── Featured ── */
 document.getElementById('featured-form').addEventListener('submit', async (e) => {
   e.preventDefault();
   const file = document.getElementById('featured-file').files[0];
-  const fd = new FormData();
-  fd.append('section', 'featured');
-  fd.append('caption', document.getElementById('featured-caption').value);
-  if (file) fd.append('image', file);
-  else if (!galleryData.featuredPhoto?.src) { showToast('Select an image', true); return; }
   try {
-    const featuredPhoto = {
+    galleryData.featuredPhoto = {
       ...galleryData.featuredPhoto,
       caption: document.getElementById('featured-caption').value,
       comingSoon: document.getElementById('featured-coming-soon').checked,
       comingSoonLabel: document.getElementById('featured-lock-label').value || 'Coming Soon',
     };
     if (file) {
-      galleryData = (await uploadImage(fd)).gallery;
-      galleryData = await api('/gallery/meta', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ featuredPhoto: { ...galleryData.featuredPhoto, ...featuredPhoto } }),
-      });
+      galleryData = await uploadImage(galleryData, { section: 'featured', file, caption: galleryData.featuredPhoto.caption });
     } else {
-      galleryData = await api('/gallery/meta', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ featuredPhoto }),
-      });
+      if (!galleryData.featuredPhoto?.src) { showToast('Select an image', true); return; }
+      galleryData = await saveGallery(galleryData);
     }
     populateAll();
     showToast('Featured photo saved');
   } catch (err) { showToast(err.message, true); }
 });
 
-/* ── Timeline ── */
 function renderTimelineList() {
   const el = document.getElementById('timeline-list');
-  const items = galleryData.timeline || [];
-  el.innerHTML = items.map((item, i) => `
-    <div class="admin-item" data-idx="${i}">
+  el.innerHTML = (galleryData.timeline || []).map((item, i) => `
+    <div class="admin-item">
       <div class="admin-item__body">
         <p class="admin-item__title">${item.title} ${item.upcoming ? '(upcoming)' : ''}</p>
         <p class="admin-item__meta">${item.date} — ${item.description}</p>
@@ -177,35 +157,20 @@ document.getElementById('timeline-add-form').addEventListener('submit', (e) => {
 
 document.getElementById('timeline-save').addEventListener('click', async () => {
   try {
-    galleryData = await api('/gallery/section/timeline', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ items: galleryData.timeline }),
-    });
+    galleryData = await saveGallery(galleryData);
     showToast('Timeline saved');
   } catch (err) { showToast(err.message, true); }
 });
 
-/* ── Then & Now ── */
-async function saveThenNow(side, fileId, captionId, previewId) {
-  const file = document.getElementById(fileId).files[0];
-  const fd = new FormData();
-  fd.append('section', side);
-  fd.append('caption', document.getElementById(captionId).value);
+async function saveThenNow(side) {
+  const file = document.getElementById(`${side}-file`).files[0];
+  const caption = document.getElementById(`${side}-caption`).value;
   if (file) {
-    fd.append('image', file);
-    galleryData = (await uploadImage(fd)).gallery;
+    galleryData = await uploadImage(galleryData, { section: side, file, caption });
   } else {
-    galleryData = await api('/gallery/meta', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        thenAndNow: {
-          ...galleryData.thenAndNow,
-          [side]: { ...galleryData.thenAndNow?.[side], caption: document.getElementById(captionId).value },
-        },
-      }),
-    });
+    if (!galleryData.thenAndNow) galleryData.thenAndNow = {};
+    galleryData.thenAndNow[side] = { ...galleryData.thenAndNow[side], caption };
+    galleryData = await saveGallery(galleryData);
   }
   populateAll();
   showToast(`${side === 'then' ? 'Then' : 'Now'} saved`);
@@ -213,31 +178,23 @@ async function saveThenNow(side, fileId, captionId, previewId) {
 
 document.getElementById('then-form').addEventListener('submit', async (e) => {
   e.preventDefault();
-  try { await saveThenNow('then', 'then-file', 'then-caption', 'then-preview'); }
-  catch (err) { showToast(err.message, true); }
+  try { await saveThenNow('then'); } catch (err) { showToast(err.message, true); }
 });
 
 document.getElementById('now-form').addEventListener('submit', async (e) => {
   e.preventDefault();
-  try { await saveThenNow('now', 'now-file', 'now-caption', 'now-preview'); }
-  catch (err) { showToast(err.message, true); }
+  try { await saveThenNow('now'); } catch (err) { showToast(err.message, true); }
 });
 
-/* ── Wedding ── */
 document.getElementById('wedding-meta-form').addEventListener('submit', async (e) => {
   e.preventDefault();
   try {
-    galleryData = await api('/gallery/meta', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        weddingDay: {
-          ...galleryData.weddingDay,
-          title: document.getElementById('wedding-title').value,
-          subtitle: document.getElementById('wedding-subtitle').value,
-        },
-      }),
-    });
+    galleryData.weddingDay = {
+      ...galleryData.weddingDay,
+      title: document.getElementById('wedding-title').value,
+      subtitle: document.getElementById('wedding-subtitle').value,
+    };
+    galleryData = await saveGallery(galleryData);
     showToast('Wedding section saved');
   } catch (err) { showToast(err.message, true); }
 });
@@ -246,13 +203,13 @@ document.getElementById('wedding-upload-form').addEventListener('submit', async 
   e.preventDefault();
   const file = document.getElementById('wedding-file').files[0];
   if (!file) { showToast('Select a photo', true); return; }
-  const fd = new FormData();
-  fd.append('section', 'wedding');
-  fd.append('caption', document.getElementById('wedding-caption').value);
-  fd.append('date', document.getElementById('wedding-date').value);
-  fd.append('image', file);
   try {
-    galleryData = (await uploadImage(fd)).gallery;
+    galleryData = await uploadImage(galleryData, {
+      section: 'wedding',
+      file,
+      caption: document.getElementById('wedding-caption').value,
+      date: document.getElementById('wedding-date').value,
+    });
     document.getElementById('wedding-upload-form').reset();
     renderWeddingList();
     showToast('Wedding photo uploaded');
@@ -261,8 +218,7 @@ document.getElementById('wedding-upload-form').addEventListener('submit', async 
 
 function renderWeddingList() {
   const el = document.getElementById('wedding-list');
-  const imgs = galleryData.weddingDay?.images || [];
-  el.innerHTML = imgs.map((img) => `
+  el.innerHTML = (galleryData.weddingDay?.images || []).map((img) => `
     <div class="admin-item">
       <img src="${img.src}" alt="" style="width:60px;height:60px;object-fit:cover;border-radius:4px" />
       <div class="admin-item__body"><p class="admin-item__title">${img.caption || 'No caption'}</p></div>
@@ -272,7 +228,7 @@ function renderWeddingList() {
     btn.addEventListener('click', async () => {
       if (!confirm('Delete?')) return;
       try {
-        galleryData = await api(`/images?section=wedding&imageId=${btn.dataset.delWd}`, { method: 'DELETE' });
+        galleryData = await deleteImage(galleryData, { section: 'wedding', imageId: btn.dataset.delWd });
         renderWeddingList();
         showToast('Deleted');
       } catch (err) { showToast(err.message, true); }
@@ -280,11 +236,10 @@ function renderWeddingList() {
   });
 }
 
-/* ── Highlights ── */
 function renderHighlightsAdmin() {
   const el = document.getElementById('highlights-admin');
   el.innerHTML = (galleryData.yearHighlights || []).map((block) => `
-    <div class="highlight-admin-block" data-hl="${block.id}">
+    <div class="highlight-admin-block">
       <div class="highlight-admin-block__head">
         <strong>${block.label}</strong>
         <button class="btn btn--danger btn--sm" data-del-hl="${block.id}">Delete Chapter</button>
@@ -306,13 +261,13 @@ function renderHighlightsAdmin() {
   el.querySelectorAll('.hl-upload-form').forEach((form) => {
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const fd = new FormData();
-      fd.append('section', 'highlights');
-      fd.append('highlightId', form.dataset.hlId);
-      fd.append('caption', form.querySelector('.hl-caption').value);
-      fd.append('image', form.querySelector('.hl-file').files[0]);
       try {
-        galleryData = (await uploadImage(fd)).gallery;
+        galleryData = await uploadImage(galleryData, {
+          section: 'highlights',
+          highlightId: form.dataset.hlId,
+          file: form.querySelector('.hl-file').files[0],
+          caption: form.querySelector('.hl-caption').value,
+        });
         renderHighlightsAdmin();
         showToast('Highlight photo added');
       } catch (err) { showToast(err.message, true); }
@@ -322,7 +277,11 @@ function renderHighlightsAdmin() {
   el.querySelectorAll('[data-del-hp]').forEach((btn) => {
     btn.addEventListener('click', async () => {
       try {
-        galleryData = await api(`/images?section=highlights&highlightId=${btn.dataset.hl}&imageId=${btn.dataset.delHp}`, { method: 'DELETE' });
+        galleryData = await deleteImage(galleryData, {
+          section: 'highlights',
+          highlightId: btn.dataset.hl,
+          imageId: btn.dataset.delHp,
+        });
         renderHighlightsAdmin();
         showToast('Deleted');
       } catch (err) { showToast(err.message, true); }
@@ -333,13 +292,11 @@ function renderHighlightsAdmin() {
     btn.addEventListener('click', async () => {
       if (!confirm('Delete chapter?')) return;
       galleryData.yearHighlights = galleryData.yearHighlights.filter((b) => b.id !== btn.dataset.delHl);
-      galleryData = await api('/gallery/section/yearHighlights', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ items: galleryData.yearHighlights }),
-      });
-      renderHighlightsAdmin();
-      showToast('Chapter deleted');
+      try {
+        galleryData = await saveGallery(galleryData);
+        renderHighlightsAdmin();
+        showToast('Chapter deleted');
+      } catch (err) { showToast(err.message, true); }
     });
   });
 }
@@ -353,17 +310,14 @@ document.getElementById('highlight-add-form').addEventListener('submit', async (
     label: document.getElementById('hl-label').value,
     photos: [],
   });
-  galleryData = await api('/gallery/section/yearHighlights', {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ items: galleryData.yearHighlights }),
-  });
-  document.getElementById('highlight-add-form').reset();
-  renderHighlightsAdmin();
-  showToast('Chapter added');
+  try {
+    galleryData = await saveGallery(galleryData);
+    document.getElementById('highlight-add-form').reset();
+    renderHighlightsAdmin();
+    showToast('Chapter added');
+  } catch (err) { showToast(err.message, true); }
 });
 
-/* ── Quotes ── */
 function renderQuotesList() {
   const el = document.getElementById('quotes-list');
   el.innerHTML = (galleryData.quotes || []).map((q, i) => `
@@ -385,11 +339,10 @@ document.getElementById('quote-add-form').addEventListener('submit', (e) => {
 });
 
 document.getElementById('quotes-save').addEventListener('click', async () => {
-  galleryData = await api('/gallery/section/quotes', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ items: galleryData.quotes }) });
-  showToast('Quotes saved');
+  try { galleryData = await saveGallery(galleryData); showToast('Quotes saved'); }
+  catch (err) { showToast(err.message, true); }
 });
 
-/* ── Places ── */
 function renderPlacesList() {
   const el = document.getElementById('places-list');
   el.innerHTML = (galleryData.places || []).map((p, i) => `
@@ -416,33 +369,28 @@ document.getElementById('place-add-form').addEventListener('submit', (e) => {
 });
 
 document.getElementById('places-save').addEventListener('click', async () => {
-  galleryData = await api('/gallery/section/places', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ items: galleryData.places }) });
-  showToast('Places saved');
+  try { galleryData = await saveGallery(galleryData); showToast('Places saved'); }
+  catch (err) { showToast(err.message, true); }
 });
 
-/* ── Letter ── */
 document.getElementById('letter-form').addEventListener('submit', async (e) => {
   e.preventDefault();
-  galleryData = await api('/gallery/meta', {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ loveLetter: { title: document.getElementById('letter-title').value, content: document.getElementById('letter-content').value } }),
-  });
-  showToast('Letter saved');
+  galleryData.loveLetter = { title: document.getElementById('letter-title').value, content: document.getElementById('letter-content').value };
+  try { galleryData = await saveGallery(galleryData); showToast('Letter saved'); }
+  catch (err) { showToast(err.message, true); }
 });
 
-/* ── Song ── */
 document.getElementById('song-form').addEventListener('submit', async (e) => {
   e.preventDefault();
-  galleryData = await api('/gallery/meta', {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ ourSong: { title: document.getElementById('song-title').value, artist: document.getElementById('song-artist').value, url: document.getElementById('song-url').value } }),
-  });
-  showToast('Song saved');
+  galleryData.ourSong = {
+    title: document.getElementById('song-title').value,
+    artist: document.getElementById('song-artist').value,
+    url: document.getElementById('song-url').value,
+  };
+  try { galleryData = await saveGallery(galleryData); showToast('Song saved'); }
+  catch (err) { showToast(err.message, true); }
 });
 
-/* ── Messages ── */
 function renderMessagesList() {
   const el = document.getElementById('messages-list');
   el.innerHTML = (galleryData.anniversaryMessages || []).map((m, i) => `
@@ -459,8 +407,7 @@ document.getElementById('message-add-form').addEventListener('submit', (e) => {
   e.preventDefault();
   if (!galleryData.anniversaryMessages) galleryData.anniversaryMessages = [];
   galleryData.anniversaryMessages.unshift({
-    id: uid('am'),
-    year: 0,
+    id: uid('am'), year: 0,
     title: document.getElementById('msg-title').value,
     date: document.getElementById('msg-date').value,
     message: document.getElementById('msg-text').value,
@@ -470,11 +417,10 @@ document.getElementById('message-add-form').addEventListener('submit', (e) => {
 });
 
 document.getElementById('messages-save').addEventListener('click', async () => {
-  galleryData = await api('/gallery/section/anniversaryMessages', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ items: galleryData.anniversaryMessages }) });
-  showToast('Messages saved');
+  try { galleryData = await saveGallery(galleryData); showToast('Messages saved'); }
+  catch (err) { showToast(err.message, true); }
 });
 
-/* ── Videos ── */
 function renderVideosList() {
   const el = document.getElementById('videos-list');
   el.innerHTML = (galleryData.videos || []).map((v, i) => `
@@ -501,22 +447,17 @@ document.getElementById('video-add-form').addEventListener('submit', (e) => {
 });
 
 document.getElementById('videos-save').addEventListener('click', async () => {
-  galleryData = await api('/gallery/section/videos', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ items: galleryData.videos }) });
-  showToast('Videos saved');
+  try { galleryData = await saveGallery(galleryData); showToast('Videos saved'); }
+  catch (err) { showToast(err.message, true); }
 });
 
-/* ── Password ── */
 document.getElementById('password-form').addEventListener('submit', async (e) => {
   e.preventDefault();
-  galleryData = await api('/gallery/meta', {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ sitePassword: document.getElementById('site-password').value }),
-  });
-  showToast('Password saved');
+  galleryData.sitePassword = document.getElementById('site-password').value;
+  try { galleryData = await saveGallery(galleryData); showToast('Password saved'); }
+  catch (err) { showToast(err.message, true); }
 });
 
-/* ── Gallery (months) ── */
 function renderGalleryAdmin() {
   const monthSelect = document.getElementById('upload-month');
   monthSelect.innerHTML = '<option value="">Select month...</option>';
@@ -548,55 +489,80 @@ function renderGalleryAdmin() {
   container.querySelectorAll('[data-del-month]').forEach((btn) => {
     btn.addEventListener('click', async () => {
       if (!confirm('Delete month?')) return;
-      galleryData = await api(`/months/${btn.dataset.delMonth}`, { method: 'DELETE' });
-      renderGalleryAdmin();
-      showToast('Month deleted');
+      try {
+        galleryData = await deleteMonth(galleryData, btn.dataset.delMonth);
+        renderGalleryAdmin();
+        showToast('Month deleted');
+      } catch (err) { showToast(err.message, true); }
     });
   });
 
   container.querySelectorAll('[data-del-img]').forEach((btn) => {
     btn.addEventListener('click', async () => {
       if (!confirm('Delete photo?')) return;
-      galleryData = await api(`/images/${btn.dataset.delImg}?monthId=${btn.dataset.month}`, { method: 'DELETE' });
-      renderGalleryAdmin();
-      showToast('Photo deleted');
+      try {
+        galleryData = await deleteImage(galleryData, {
+          section: 'months',
+          monthId: btn.dataset.month,
+          imageId: btn.dataset.delImg,
+        });
+        renderGalleryAdmin();
+        showToast('Photo deleted');
+      } catch (err) { showToast(err.message, true); }
     });
   });
 }
 
 document.getElementById('add-month-form').addEventListener('submit', async (e) => {
   e.preventDefault();
-  galleryData = await api('/months', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ id: document.getElementById('month-id').value, label: document.getElementById('month-label').value }),
-  });
-  document.getElementById('add-month-form').reset();
-  renderGalleryAdmin();
-  showToast('Month added');
+  try {
+    galleryData = await addMonth(galleryData, {
+      id: document.getElementById('month-id').value,
+      label: document.getElementById('month-label').value,
+    });
+    document.getElementById('add-month-form').reset();
+    renderGalleryAdmin();
+    showToast('Month added');
+  } catch (err) { showToast(err.message, true); }
 });
 
 document.getElementById('upload-form').addEventListener('submit', async (e) => {
   e.preventDefault();
   const file = document.getElementById('upload-file').files[0];
   if (!file) { showToast('Select a photo', true); return; }
-  const fd = new FormData();
-  fd.append('image', file);
-  fd.append('monthId', document.getElementById('upload-month').value);
-  fd.append('caption', document.getElementById('upload-caption').value);
-  fd.append('date', document.getElementById('upload-date').value || new Date().toISOString().split('T')[0]);
   try {
-    galleryData = (await api('/images', { method: 'POST', body: fd })).gallery;
+    galleryData = await uploadImage(galleryData, {
+      section: 'months',
+      monthId: document.getElementById('upload-month').value,
+      file,
+      caption: document.getElementById('upload-caption').value,
+      date: document.getElementById('upload-date').value || new Date().toISOString().split('T')[0],
+    });
     document.getElementById('upload-form').reset();
     renderGalleryAdmin();
     showToast('Photo uploaded');
   } catch (err) { showToast(err.message, true); }
 });
 
-document.getElementById('logout-btn').addEventListener('click', () => {
-  sessionStorage.removeItem(SESSION_KEY);
-  window.location.href = '/admin.html';
+document.getElementById('logout-btn').addEventListener('click', async () => {
+  if (isFirebaseConfigured()) await firebaseSignOut();
+  else sessionStorage.removeItem(SESSION_KEY);
+  window.location.href = `${import.meta.env.BASE_URL}admin.html`;
 });
 
-initTabs();
-loadGallery();
+function startApp() {
+  initTabs();
+  loadGalleryData();
+}
+
+if (isFirebaseConfigured()) {
+  watchAuth((user) => {
+    if (!user) window.location.replace(`${import.meta.env.BASE_URL}admin.html`);
+    else startApp();
+  });
+} else {
+  if (sessionStorage.getItem(SESSION_KEY) !== 'true') {
+    window.location.replace(`${import.meta.env.BASE_URL}admin.html`);
+  }
+  startApp();
+}

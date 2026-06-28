@@ -1,3 +1,5 @@
+import { loadGallery } from './gallery-api.js';
+
 const SITE_AUTH_KEY = 'gallery-site-auth';
 
 let galleryData = null;
@@ -23,8 +25,7 @@ const SECTIONS = [
 
 async function init() {
   try {
-    const res = await fetch('/data/gallery.json');
-    galleryData = await res.json();
+    galleryData = await loadGallery();
   } catch {
     galleryData = { title: 'Our Love Story', months: [] };
   }
