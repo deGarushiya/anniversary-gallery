@@ -3,18 +3,28 @@ const SESSION_KEY = 'gallery-unlocked';
 const MAIL_KEY = 'gallery-mail-opened';
 const LETTER_KEY = 'gallery-letter-read';
 const FLOWERS_KEY = 'gallery-flowers-seen';
+const FAVORITE_KEY = 'gallery-favorite-seen';
+const SONG_KEY = 'gallery-song-seen';
+const SCRAPBOOK_KEY = 'gallery-scrapbook-seen';
+const FINALE_KEY = 'gallery-finale-seen';
 
 const gate = document.getElementById('gate');
 const welcome = document.getElementById('welcome');
 const mail = document.getElementById('mail');
 const letter = document.getElementById('letter');
 const flowers = document.getElementById('flowers');
-const mainPage = document.getElementById('main-page');
+const favorite = document.getElementById('favorite');
+const song = document.getElementById('song');
+const scrapbook = document.getElementById('scrapbook');
+const finale = document.getElementById('finale');
 const deniedModal = document.getElementById('denied-modal');
 const gateForm = document.getElementById('gate-form');
 const mailOpen = document.getElementById('mail-open');
 const letterContinue = document.getElementById('letter-continue');
 const flowersContinue = document.getElementById('flowers-continue');
+const favoriteContinue = document.getElementById('favorite-continue');
+const songContinue = document.getElementById('song-continue');
+const scrapbookContinue = document.getElementById('scrapbook-continue');
 const digits = [...document.querySelectorAll('.gate__digit')];
 
 function getPinValue() {
@@ -53,11 +63,35 @@ function showFlowers() {
   }, 550);
 }
 
-function showMain() {
+function showFavorite() {
   flowers.classList.add('is-hidden');
   setTimeout(() => {
     flowers.hidden = true;
-    mainPage.hidden = false;
+    favorite.hidden = false;
+  }, 550);
+}
+
+function showSong() {
+  favorite.classList.add('is-hidden');
+  setTimeout(() => {
+    favorite.hidden = true;
+    song.hidden = false;
+  }, 550);
+}
+
+function showScrapbook() {
+  song.classList.add('is-hidden');
+  setTimeout(() => {
+    song.hidden = true;
+    scrapbook.hidden = false;
+  }, 550);
+}
+
+function showFinale() {
+  scrapbook.classList.add('is-hidden');
+  setTimeout(() => {
+    scrapbook.hidden = true;
+    finale.hidden = false;
   }, 550);
 }
 
@@ -81,8 +115,16 @@ function unlockSite() {
 
 function resumeAfterUnlock() {
   gate.hidden = true;
-  if (sessionStorage.getItem(FLOWERS_KEY) === 'true') {
-    mainPage.hidden = false;
+  if (sessionStorage.getItem(FINALE_KEY) === 'true') {
+    finale.hidden = false;
+  } else if (sessionStorage.getItem(SCRAPBOOK_KEY) === 'true') {
+    showFinale();
+  } else if (sessionStorage.getItem(SONG_KEY) === 'true') {
+    scrapbook.hidden = false;
+  } else if (sessionStorage.getItem(FAVORITE_KEY) === 'true') {
+    song.hidden = false;
+  } else if (sessionStorage.getItem(FLOWERS_KEY) === 'true') {
+    favorite.hidden = false;
   } else if (sessionStorage.getItem(LETTER_KEY) === 'true') {
     flowers.hidden = false;
   } else if (sessionStorage.getItem(MAIL_KEY) === 'true') {
@@ -112,7 +154,23 @@ letterContinue.addEventListener('click', () => {
 
 flowersContinue.addEventListener('click', () => {
   sessionStorage.setItem(FLOWERS_KEY, 'true');
-  showMain();
+  showFavorite();
+});
+
+favoriteContinue.addEventListener('click', () => {
+  sessionStorage.setItem(FAVORITE_KEY, 'true');
+  showSong();
+});
+
+songContinue.addEventListener('click', () => {
+  sessionStorage.setItem(SONG_KEY, 'true');
+  showScrapbook();
+});
+
+scrapbookContinue.addEventListener('click', () => {
+  sessionStorage.setItem(SCRAPBOOK_KEY, 'true');
+  sessionStorage.setItem(FINALE_KEY, 'true');
+  showFinale();
 });
 
 digits.forEach((input, i) => {
