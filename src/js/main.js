@@ -1,11 +1,14 @@
 const PASSCODE = '0705';
 const SESSION_KEY = 'gallery-unlocked';
+const MAIL_KEY = 'gallery-mail-opened';
 
 const gate = document.getElementById('gate');
 const welcome = document.getElementById('welcome');
+const mail = document.getElementById('mail');
 const mainPage = document.getElementById('main-page');
 const deniedModal = document.getElementById('denied-modal');
 const gateForm = document.getElementById('gate-form');
+const mailOpen = document.getElementById('mail-open');
 const digits = [...document.querySelectorAll('.gate__digit')];
 
 function getPinValue() {
@@ -26,32 +29,57 @@ function hideDenied() {
   deniedModal.hidden = true;
 }
 
-function unlockSite() {
-  sessionStorage.setItem(SESSION_KEY, 'true');
-  gate.classList.add('is-hidden');
-  setTimeout(() => { gate.hidden = true; }, 500);
+function showMail() {
+  mail.hidden = false;
+}
 
+function showMain() {
+  mail.classList.add('is-hidden');
+  setTimeout(() => {
+    mail.hidden = true;
+    mainPage.hidden = false;
+  }, 550);
+}
+
+function showWelcomeThenMail() {
   welcome.hidden = false;
   setTimeout(() => {
     welcome.classList.add('is-leaving');
     setTimeout(() => {
       welcome.hidden = true;
-      mainPage.hidden = false;
+      showMail();
     }, 600);
   }, 2200);
 }
 
-function skipToMain() {
+function unlockSite() {
+  sessionStorage.setItem(SESSION_KEY, 'true');
   gate.classList.add('is-hidden');
+  setTimeout(() => { gate.hidden = true; }, 500);
+  showWelcomeThenMail();
+}
+
+function resumeAfterUnlock() {
   gate.hidden = true;
-  mainPage.hidden = false;
+  if (sessionStorage.getItem(MAIL_KEY) === 'true') {
+    mainPage.hidden = false;
+  } else {
+    showMail();
+  }
 }
 
 if (sessionStorage.getItem(SESSION_KEY) === 'true') {
-  skipToMain();
+  resumeAfterUnlock();
 } else {
   digits[0].focus();
 }
+
+mailOpen.addEventListener('click', () => {
+  if (mailOpen.classList.contains('is-opening')) return;
+  mailOpen.classList.add('is-opening');
+  sessionStorage.setItem(MAIL_KEY, 'true');
+  setTimeout(showMain, 900);
+});
 
 digits.forEach((input, i) => {
   input.addEventListener('input', () => {

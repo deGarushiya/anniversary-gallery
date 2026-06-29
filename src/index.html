@@ -7,7 +7,7 @@
   <meta name="description" content="Our journey to forever" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Jost:wght@300;400&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Dancing+Script:wght@600;700&family=Jost:wght@300;400&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/css/main.css" />
 </head>
 <body>
@@ -62,6 +62,39 @@
   <div class="welcome" id="welcome" hidden>
     <p class="welcome__text">HI LOVEEEEYYYY, hehehe WELCOMEEEE</p>
   </div>
+
+  <!-- You've got mail -->
+  <section class="mail" id="mail" hidden>
+    <div class="mail__frame">
+      <div class="mail__inner">
+        <p class="mail__title">You got a mail!</p>
+
+        <button type="button" class="mail__envelope-btn" id="mail-open" aria-label="Tap to open the envelope">
+          <svg class="mail__sparkle" viewBox="0 0 40 40" aria-hidden="true">
+            <path d="M28 4 L30 10 L36 12 L30 14 L28 20 L26 14 L20 12 L26 10 Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M34 2 L35 5 L38 6 L35 7 L34 10 L33 7 L30 6 L33 5 Z" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+          </svg>
+
+          <svg class="mail__envelope" viewBox="0 0 200 140" aria-hidden="true">
+            <rect class="mail__env-body" x="20" y="45" width="160" height="90" rx="3" fill="#c41e3a"/>
+            <path class="mail__env-flap" d="M20 45 L100 95 L180 45 Z" fill="#b01830"/>
+            <path class="mail__env-fold" d="M20 45 L100 95 L180 45 L180 135 L20 135 Z" fill="#a91528" opacity="0.35"/>
+            <circle class="mail__seal" cx="100" cy="88" r="18" fill="#d4a84b"/>
+            <circle cx="100" cy="88" r="14" fill="#c9983a"/>
+            <ellipse cx="96" cy="84" rx="5" ry="4" fill="rgba(255,255,255,0.25)"/>
+          </svg>
+
+          <svg class="mail__hearts" viewBox="0 0 60 50" aria-hidden="true">
+            <path d="M12 18 C12 10 22 8 22 16 C22 8 32 10 32 18 C32 28 22 36 22 36 C22 36 12 28 12 18Z" fill="none" stroke="currentColor" stroke-width="1.8"/>
+            <path d="M4 28 C4 22 10 20 10 26 C10 20 16 22 16 28 C16 34 10 38 10 38 C10 38 4 34 4 28Z" fill="none" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M20 32 C20 27 25 25 25 30 C25 25 30 27 30 32 C30 37 25 41 25 41 C25 41 20 37 20 32Z" fill="none" stroke="currentColor" stroke-width="1.5"/>
+          </svg>
+        </button>
+
+        <p class="mail__hint">tap on the envelope to open</p>
+      </div>
+    </div>
+  </section>
 
   <!-- Main site (sections added later) -->
   <main class="page" id="main-page" hidden>
