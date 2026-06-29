@@ -2,16 +2,19 @@ const PASSCODE = '0705';
 const SESSION_KEY = 'gallery-unlocked';
 const MAIL_KEY = 'gallery-mail-opened';
 const LETTER_KEY = 'gallery-letter-read';
+const FLOWERS_KEY = 'gallery-flowers-seen';
 
 const gate = document.getElementById('gate');
 const welcome = document.getElementById('welcome');
 const mail = document.getElementById('mail');
 const letter = document.getElementById('letter');
+const flowers = document.getElementById('flowers');
 const mainPage = document.getElementById('main-page');
 const deniedModal = document.getElementById('denied-modal');
 const gateForm = document.getElementById('gate-form');
 const mailOpen = document.getElementById('mail-open');
 const letterContinue = document.getElementById('letter-continue');
+const flowersContinue = document.getElementById('flowers-continue');
 const digits = [...document.querySelectorAll('.gate__digit')];
 
 function getPinValue() {
@@ -42,10 +45,18 @@ function showLetter() {
   letter.hidden = false;
 }
 
-function showMain() {
+function showFlowers() {
   letter.classList.add('is-hidden');
   setTimeout(() => {
     letter.hidden = true;
+    flowers.hidden = false;
+  }, 550);
+}
+
+function showMain() {
+  flowers.classList.add('is-hidden');
+  setTimeout(() => {
+    flowers.hidden = true;
     mainPage.hidden = false;
   }, 550);
 }
@@ -70,8 +81,10 @@ function unlockSite() {
 
 function resumeAfterUnlock() {
   gate.hidden = true;
-  if (sessionStorage.getItem(LETTER_KEY) === 'true') {
+  if (sessionStorage.getItem(FLOWERS_KEY) === 'true') {
     mainPage.hidden = false;
+  } else if (sessionStorage.getItem(LETTER_KEY) === 'true') {
+    flowers.hidden = false;
   } else if (sessionStorage.getItem(MAIL_KEY) === 'true') {
     showLetter();
   } else {
@@ -94,6 +107,11 @@ mailOpen.addEventListener('click', () => {
 
 letterContinue.addEventListener('click', () => {
   sessionStorage.setItem(LETTER_KEY, 'true');
+  showFlowers();
+});
+
+flowersContinue.addEventListener('click', () => {
+  sessionStorage.setItem(FLOWERS_KEY, 'true');
   showMain();
 });
 
