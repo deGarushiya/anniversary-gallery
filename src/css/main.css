@@ -161,6 +161,7 @@ body {
   .gate,
   .welcome,
   .mail,
+  .letter,
   .page { visibility: hidden; }
 }
 
@@ -523,16 +524,185 @@ body {
   text-transform: lowercase;
 }
 
-/* Hide soft bg while mail screen is showing */
-body:has(.mail:not([hidden]):not(.is-hidden)) .watercolor-bg,
-body:has(.mail:not([hidden]):not(.is-hidden)) .butterflies {
-  opacity: 0;
-  transition: opacity 0.4s ease;
-}
-
 @media (orientation: landscape) and (max-height: 420px) {
   .mail__title { font-size: 1.55rem; }
   .mail__envelope { width: clamp(120px, 32vw, 180px); }
   .mail__inner { gap: 0.25rem; }
+}
+
+/* ── Love letter ── */
+.letter {
+  position: fixed;
+  inset: 0;
+  z-index: 14;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.5rem;
+  gap: 0.65rem;
+}
+
+.letter::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(50, 32, 38, 0.42);
+  z-index: 0;
+  pointer-events: none;
+}
+
+.letter.is-hidden {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.55s ease;
+}
+
+.letter__stack {
+  position: relative;
+  z-index: 1;
+  width: min(640px, 88vw);
+  max-height: min(78vh, 100%);
+  flex-shrink: 1;
+  min-height: 0;
+}
+
+.letter__sheet {
+  background: #fff;
+  border-radius: 2px;
+  box-shadow: 0 10px 36px rgba(40, 20, 25, 0.22);
+}
+
+.letter__sheet--back-2 {
+  position: absolute;
+  inset: 0;
+  transform: rotate(-3.5deg) translate(-6px, 5px);
+  z-index: 1;
+}
+
+.letter__sheet--back-1 {
+  position: absolute;
+  inset: 0;
+  transform: rotate(-1.5deg) translate(-3px, 2px);
+  z-index: 2;
+}
+
+.letter__sheet--front {
+  position: relative;
+  z-index: 3;
+  transform: rotate(-0.8deg);
+  max-height: min(78vh, 520px);
+  overflow: visible;
+  display: flex;
+  flex-direction: column;
+}
+
+.letter__content {
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+  padding: clamp(2.5rem, 6vh, 3.25rem) clamp(1.5rem, 4vw, 2.25rem) clamp(1.25rem, 3.5vh, 2rem);
+  text-align: center;
+}
+
+.letter__floral {
+  position: absolute;
+  width: clamp(88px, 22vw, 130px);
+  height: auto;
+  pointer-events: none;
+  z-index: 4;
+  opacity: 0.95;
+  filter: drop-shadow(0 3px 8px rgba(60, 30, 35, 0.12));
+  will-change: transform;
+}
+
+.letter__floral--tl {
+  top: -0.75rem;
+  left: -0.85rem;
+  transform: rotate(-6deg);
+  animation: floral-drift-tl 7s ease-in-out infinite;
+}
+
+.letter__floral--br {
+  bottom: -0.75rem;
+  right: -0.85rem;
+  transform: rotate(174deg) scaleX(-1);
+  animation: floral-drift-br 8.5s ease-in-out infinite;
+}
+
+@keyframes floral-drift-tl {
+  0%, 100% { transform: rotate(-6deg) translate(0, 0); }
+  35% { transform: rotate(-4deg) translate(5px, -6px); }
+  70% { transform: rotate(-7deg) translate(-4px, 4px); }
+}
+
+@keyframes floral-drift-br {
+  0%, 100% { transform: rotate(174deg) scaleX(-1) translate(0, 0); }
+  40% { transform: rotate(172deg) scaleX(-1) translate(-5px, 5px); }
+  75% { transform: rotate(176deg) scaleX(-1) translate(4px, -4px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .letter__floral--tl,
+  .letter__floral--br {
+    animation: none;
+  }
+}
+
+.letter__title {
+  font-family: 'Dancing Script', cursive;
+  font-size: clamp(1.65rem, 5.5vw, 2.35rem);
+  font-weight: 700;
+  color: var(--mail-red);
+  margin-bottom: clamp(0.65rem, 2vh, 1rem);
+  line-height: 1.15;
+}
+
+.letter__body {
+  font-family: var(--font-sans);
+  font-size: clamp(0.72rem, 2.1vw, 0.88rem);
+  font-weight: 400;
+  color: var(--mail-red);
+  line-height: 1.55;
+  text-align: center;
+}
+
+.letter__body p + p {
+  margin-top: 0.85rem;
+}
+
+.letter__continue {
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #fff;
+  background: rgba(143, 29, 29, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 2rem;
+  padding: 0.55rem 1.35rem;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.letter__continue:hover {
+  background: var(--mail-red);
+  transform: translateY(-1px);
+}
+
+@media (orientation: landscape) and (max-height: 420px) {
+  .letter { padding: 0.5rem 1.25rem; gap: 0.4rem; }
+  .letter__stack { max-height: 72vh; }
+  .letter__sheet--front { max-height: 72vh; }
+  .letter__content {
+    padding: 2rem 1.25rem 0.85rem;
+  }
+  .letter__title { font-size: 1.45rem; margin-bottom: 0.5rem; }
+  .letter__body { font-size: 0.68rem; line-height: 1.45; }
+  .letter__body p + p { margin-top: 0.55rem; }
+  .letter__floral { width: 72px; }
 }
 

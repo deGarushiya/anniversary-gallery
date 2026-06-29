@@ -1,14 +1,17 @@
 const PASSCODE = '0705';
 const SESSION_KEY = 'gallery-unlocked';
 const MAIL_KEY = 'gallery-mail-opened';
+const LETTER_KEY = 'gallery-letter-read';
 
 const gate = document.getElementById('gate');
 const welcome = document.getElementById('welcome');
 const mail = document.getElementById('mail');
+const letter = document.getElementById('letter');
 const mainPage = document.getElementById('main-page');
 const deniedModal = document.getElementById('denied-modal');
 const gateForm = document.getElementById('gate-form');
 const mailOpen = document.getElementById('mail-open');
+const letterContinue = document.getElementById('letter-continue');
 const digits = [...document.querySelectorAll('.gate__digit')];
 
 function getPinValue() {
@@ -33,10 +36,16 @@ function showMail() {
   mail.hidden = false;
 }
 
-function showMain() {
+function showLetter() {
   mail.classList.add('is-hidden');
+  mail.hidden = true;
+  letter.hidden = false;
+}
+
+function showMain() {
+  letter.classList.add('is-hidden');
   setTimeout(() => {
-    mail.hidden = true;
+    letter.hidden = true;
     mainPage.hidden = false;
   }, 550);
 }
@@ -61,8 +70,10 @@ function unlockSite() {
 
 function resumeAfterUnlock() {
   gate.hidden = true;
-  if (sessionStorage.getItem(MAIL_KEY) === 'true') {
+  if (sessionStorage.getItem(LETTER_KEY) === 'true') {
     mainPage.hidden = false;
+  } else if (sessionStorage.getItem(MAIL_KEY) === 'true') {
+    showLetter();
   } else {
     showMail();
   }
@@ -78,7 +89,12 @@ mailOpen.addEventListener('click', () => {
   if (mailOpen.classList.contains('is-opening')) return;
   mailOpen.classList.add('is-opening');
   sessionStorage.setItem(MAIL_KEY, 'true');
-  setTimeout(showMain, 900);
+  setTimeout(showLetter, 900);
+});
+
+letterContinue.addEventListener('click', () => {
+  sessionStorage.setItem(LETTER_KEY, 'true');
+  showMain();
 });
 
 digits.forEach((input, i) => {

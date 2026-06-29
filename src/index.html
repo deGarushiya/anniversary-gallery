@@ -66,7 +66,7 @@
   <!-- You've got mail -->
   <section class="mail" id="mail" hidden>
     <div class="mail__frame">
-      <div class="mail__inner">
+      <div class="mail__inner torn-paper">
         <p class="mail__title">You got a mail!</p>
 
         <button type="button" class="mail__envelope-btn" id="mail-open" aria-label="Tap to open the envelope">
@@ -94,6 +94,26 @@
         <p class="mail__hint">tap on the envelope to open</p>
       </div>
     </div>
+  </section>
+
+  <!-- Love letter -->
+  <section class="letter" id="letter" hidden>
+    <div class="letter__stack">
+      <div class="letter__sheet letter__sheet--back-2" aria-hidden="true"></div>
+      <div class="letter__sheet letter__sheet--back-1" aria-hidden="true"></div>
+      <article class="letter__sheet letter__sheet--front">
+        <img class="letter__floral letter__floral--tl" src="/decor/botanical-bouquet.png" alt="" />
+        <img class="letter__floral letter__floral--br" src="/decor/botanical-bouquet.png" alt="" />
+        <div class="letter__content">
+          <h2 class="letter__title">A letter for you</h2>
+          <div class="letter__body">
+            <p>Happy Monthsary, love. 🤍 Another month with you may seem like a small thing to others, but for me it's another beautiful reminder that I have someone so special to love and cherish. Thank you for staying, for making me feel cared for, and for being my comfort even from afar. Every moment with you, even the simple conversations, makes my days lighter and happier.</p>
+            <p>I'm grateful for all the memories we've made and for all the months we still get to celebrate together. No matter how hard or far things get sometimes, my feelings for you only grow stronger. I love you so much, honey, and I'll always choose you, today and every monthsary after this. 🤍</p>
+          </div>
+        </div>
+      </article>
+    </div>
+    <button type="button" class="letter__continue" id="letter-continue">Continue ♡</button>
   </section>
 
   <!-- Main site (sections added later) -->
