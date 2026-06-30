@@ -8,6 +8,17 @@ const SONG_KEY = 'gallery-song-seen';
 const SCRAPBOOK_KEY = 'gallery-scrapbook-seen';
 const FINALE_KEY = 'gallery-finale-seen';
 
+const PROGRESS_KEYS = [
+  SESSION_KEY,
+  MAIL_KEY,
+  LETTER_KEY,
+  FLOWERS_KEY,
+  FAVORITE_KEY,
+  SONG_KEY,
+  SCRAPBOOK_KEY,
+  FINALE_KEY,
+];
+
 const gate = document.getElementById('gate');
 const welcome = document.getElementById('welcome');
 const mail = document.getElementById('mail');
@@ -25,6 +36,7 @@ const flowersContinue = document.getElementById('flowers-continue');
 const favoriteContinue = document.getElementById('favorite-continue');
 const songContinue = document.getElementById('song-continue');
 const scrapbookContinue = document.getElementById('scrapbook-continue');
+const finaleClose = document.getElementById('finale-close');
 const digits = [...document.querySelectorAll('.gate__digit')];
 
 function getPinValue() {
@@ -93,6 +105,24 @@ function showFinale() {
     scrapbook.hidden = true;
     finale.hidden = false;
   }, 550);
+}
+
+function resetGallerySections() {
+  [welcome, mail, letter, flowers, favorite, song, scrapbook, finale].forEach((el) => {
+    el.hidden = true;
+    el.classList.remove('is-hidden', 'is-complete', 'is-leaving');
+  });
+  mailOpen.classList.remove('is-opening');
+  welcome.classList.remove('is-leaving');
+  finaleClose.disabled = false;
+}
+
+function returnToGate() {
+  resetGallerySections();
+  PROGRESS_KEYS.forEach((key) => sessionStorage.removeItem(key));
+  gate.hidden = false;
+  gate.classList.remove('is-hidden');
+  clearPin();
 }
 
 function showWelcomeThenMail() {
@@ -171,6 +201,13 @@ scrapbookContinue.addEventListener('click', () => {
   sessionStorage.setItem(SCRAPBOOK_KEY, 'true');
   sessionStorage.setItem(FINALE_KEY, 'true');
   showFinale();
+});
+
+finaleClose.addEventListener('click', () => {
+  if (finaleClose.disabled) return;
+  finaleClose.disabled = true;
+  finale.classList.add('is-hidden');
+  setTimeout(returnToGate, 850);
 });
 
 digits.forEach((input, i) => {
